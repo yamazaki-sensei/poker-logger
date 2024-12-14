@@ -22,7 +22,33 @@ interface GameState {
     playersCount: number;
     position: Position;
   };
+  myCards: [Card, Card] | undefined;
 }
+
+export const cardNumbers = [
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "T",
+  "J",
+  "Q",
+  "K",
+  "A",
+] as const;
+export type CardNumber = (typeof cardNumbers)[number];
+
+export const cardSuits = ["c", "d", "h", "s"] as const;
+type CardSuit = (typeof cardSuits)[number];
+
+export type Card = {
+  number: CardNumber;
+  suit: CardSuit;
+};
 
 const initialGameState: GameState = {
   setting: {
@@ -32,6 +58,7 @@ const initialGameState: GameState = {
     playersCount: 9,
     position: "UTG",
   },
+  myCards: undefined,
 };
 
 const gameAtom = atomWithStorage("GameState", initialGameState);
@@ -41,8 +68,6 @@ export const useGame = (): {
   updateGameState: (state: GameState) => void;
 } => {
   const [gameState, updateGameState] = useAtom(gameAtom);
-
-  console.table(gameState);
 
   return {
     gameState,

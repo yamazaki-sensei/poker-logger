@@ -4,6 +4,9 @@ import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons";
 import { SelectItem } from "./components/Select";
 import { TextField } from "@radix-ui/themes";
+import { cardText } from "./utils/card_util";
+import * as Dialog from "@radix-ui/react-dialog";
+import { CardSelect } from "./components/CardSelect";
 
 const Footer = () => {
   const { gameState, updateGameState } = useGame();
@@ -74,7 +77,7 @@ const Footer = () => {
   );
   return (
     <div>
-      <div className="grid grid-cols-2 gap-1">
+      <div className="grid grid-cols-3 gap-1">
         <div className="flex">
           人数:
           <div>
@@ -143,6 +146,31 @@ const Footer = () => {
                 </Select.ScrollDownButton>
               </Select.Content>
             </Select.Root>
+          </div>
+        </div>
+        <div className="flex">
+          手札:
+          <div>
+            <Dialog.Root>
+              <Dialog.Trigger asChild>
+                <button type="button">未選択</button>
+              </Dialog.Trigger>
+              <Dialog.Portal>
+                <Dialog.Overlay />
+                <Dialog.Content>
+                  <Dialog.Title>手札を選択</Dialog.Title>
+                  <Dialog.Description>手札を選択</Dialog.Description>
+                  <div>
+                    <CardSelect
+                      count={2}
+                      onSelect={(card) => {
+                        console.log(cardText(card));
+                      }}
+                    />
+                  </div>
+                </Dialog.Content>
+              </Dialog.Portal>
+            </Dialog.Root>
           </div>
         </div>
       </div>
