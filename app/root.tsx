@@ -10,6 +10,8 @@ import { Theme } from "@radix-ui/themes";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { GameSettings } from "./GameSettings";
+import { Provider } from "jotai";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -35,10 +37,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Theme>
-          {children}
-          <ScrollRestoration />
-        </Theme>
+        <div>
+          <Theme>
+            <GameSettings>
+              {children}
+              <ScrollRestoration />
+            </GameSettings>
+          </Theme>
+        </div>
         <Scripts />
       </body>
     </html>
