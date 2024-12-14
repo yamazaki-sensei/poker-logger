@@ -40,7 +40,7 @@ const Footer = () => {
         ...gameState,
         setting: {
           ...gameState.setting,
-          sb: Number.parseInt(event.currentTarget.value),
+          sb: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
@@ -53,7 +53,7 @@ const Footer = () => {
         ...gameState,
         setting: {
           ...gameState.setting,
-          bb: Number.parseInt(event.currentTarget.value),
+          bb: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
@@ -66,7 +66,7 @@ const Footer = () => {
         ...gameState,
         setting: {
           ...gameState.setting,
-          anti: Number.parseInt(event.currentTarget.value),
+          anti: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
@@ -149,10 +149,11 @@ const Footer = () => {
       <div className="grid grid-cols-3 mt-2">
         <div className="flex">
           SB:
-          <div className="ml-2">
+          <div className="ml-2 max-w-1">
             <TextField.Root
               size="1"
-              value={gameState.setting.sb}
+              min={0}
+              value={`${gameState.setting.sb}`.replace(/^0+/, "") || "0"}
               onChange={onSbChange}
             />
           </div>
@@ -162,7 +163,8 @@ const Footer = () => {
           <div className="ml-2">
             <TextField.Root
               size="1"
-              value={gameState.setting.bb}
+              min={0}
+              value={`${gameState.setting.bb}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onBbChange}
             />
@@ -172,8 +174,10 @@ const Footer = () => {
           Anti:
           <div className="ml-2">
             <TextField.Root
+              color="red"
               size="1"
-              value={gameState.setting.anti}
+              min={0}
+              value={`${gameState.setting.anti}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onAntiChange}
             />
