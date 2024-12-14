@@ -39,7 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <Theme className="h-full">
+        <Theme>
           <div className="h-full">
             <GameSettings>
               {children}
