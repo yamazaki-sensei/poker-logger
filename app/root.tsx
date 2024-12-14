@@ -10,7 +10,7 @@ import { Theme } from "@radix-ui/themes";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
-import { GameSettings } from "./GameSettings";
+import { GameSettingsFrame } from "./GameSettingsFrame";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -41,10 +41,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <Theme>
           <div className="h-full">
-            <GameSettings>
+            <GameSettingsFrame>
               {children}
               <ScrollRestoration />
-            </GameSettings>
+            </GameSettingsFrame>
           </div>
         </Theme>
         <Scripts />

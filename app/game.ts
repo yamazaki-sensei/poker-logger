@@ -42,8 +42,8 @@ export const cardNumbers = [
 ] as const;
 export type CardNumber = (typeof cardNumbers)[number];
 
-export const cardSuits = ["c", "d", "h", "s"] as const;
-type CardSuit = (typeof cardSuits)[number];
+export const cardSuits = ["s", "h", "d", "c"] as const;
+export type CardSuit = (typeof cardSuits)[number];
 
 export type Card = {
   number: CardNumber;

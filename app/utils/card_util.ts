@@ -1,4 +1,4 @@
-import type { Card } from "~/game";
+import type { Card, CardSuit } from "~/game";
 
 export function cardText(card: Card): string {
   switch (card.suit) {
@@ -6,9 +6,22 @@ export function cardText(card: Card): string {
       return `${card.number}♣`;
     case "d":
       return `${card.number}♦`;
-    case "h︎":
+    case "h":
       return `${card.number}♥`;
     case "s":
       return `${card.number}♠`;
+  }
+}
+
+export function suitMark(suit: CardSuit): string {
+  switch (suit) {
+    case "c":
+      return "♣";
+    case "d":
+      return "♦";
+    case "h":
+      return "♥︎";
+    case "s":
+      return "♠";
   }
 }
