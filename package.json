@@ -6,7 +6,8 @@
     "build": "cross-env NODE_ENV=production react-router build",
     "dev": "react-router dev",
     "start": "cross-env NODE_ENV=production react-router-serve ./build/server/index.js",
-    "typecheck": "react-router typegen && tsc"
+    "typecheck": "react-router typegen && tsc",
+    "build_deploy": "pnpm build && pnpm wrangler pages deploy build/client"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.3",
