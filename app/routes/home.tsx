@@ -13,6 +13,7 @@ import { Button } from "~/components/ui/button";
 import { cardText } from "~/utils/card_util";
 import { CardSelect } from "~/components/CardSelect";
 import { gameRoundText } from "~/utils/round_util";
+import { TableSettingsFrame } from "~/TableSettingsFrame";
 
 export function meta() {
   return [
@@ -87,67 +88,73 @@ export default function Home() {
   }, [gameState.gameIndex]);
 
   return (
-    <Tabs.Root value={tab} className="w-full" onValueChange={(v) => setTab(v)}>
-      <Tabs.List
-        aria-label="Tabs"
-        className="flex overflow-x-auto border-b border-gray-300 p-2 gap-2 w-full sticky top-0 bg-secondary"
+    <TableSettingsFrame>
+      <Tabs.Root
+        value={tab}
+        className="w-full"
+        onValueChange={(v) => setTab(v)}
       >
-        <TabsTrigger value="preFlop">Pre Flop</TabsTrigger>
-        <TabsTrigger value="flop">Flop</TabsTrigger>
-        <TabsTrigger value="turn">Turn</TabsTrigger>
-        <TabsTrigger value="river">River</TabsTrigger>
-      </Tabs.List>
+        <Tabs.List
+          aria-label="Tabs"
+          className="flex overflow-x-auto border-b border-gray-300 p-2 gap-2 w-full sticky top-0 bg-secondary"
+        >
+          <TabsTrigger value="preFlop">Pre Flop</TabsTrigger>
+          <TabsTrigger value="flop">Flop</TabsTrigger>
+          <TabsTrigger value="turn">Turn</TabsTrigger>
+          <TabsTrigger value="river">River</TabsTrigger>
+        </Tabs.List>
 
-      <Tabs.Content
-        value="preFlop"
-        className={`p-4 ${tab === "preFlop" ? "" : "hidden"}`}
-        forceMount
-      >
-        <RoundTitle round="preFlop" />
-        <GameActions
-          round="preFlop"
-          onNextRound={() => {
-            setTab("flop");
-          }}
-        />
-      </Tabs.Content>
+        <Tabs.Content
+          value="preFlop"
+          className={`p-4 ${tab === "preFlop" ? "" : "hidden"}`}
+          forceMount
+        >
+          <RoundTitle round="preFlop" />
+          <GameActions
+            round="preFlop"
+            onNextRound={() => {
+              setTab("flop");
+            }}
+          />
+        </Tabs.Content>
 
-      <Tabs.Content
-        value="flop"
-        className={`p-4 ${tab === "flop" ? "" : "hidden"}`}
-        forceMount
-      >
-        <RoundTitle round="flop" />
-        <GameActions
-          round="flop"
-          onNextRound={() => {
-            setTab("turn");
-          }}
-        />
-      </Tabs.Content>
+        <Tabs.Content
+          value="flop"
+          className={`p-4 ${tab === "flop" ? "" : "hidden"}`}
+          forceMount
+        >
+          <RoundTitle round="flop" />
+          <GameActions
+            round="flop"
+            onNextRound={() => {
+              setTab("turn");
+            }}
+          />
+        </Tabs.Content>
 
-      <Tabs.Content
-        value="turn"
-        className={`p-4 ${tab === "turn" ? "" : "hidden"}`}
-        forceMount
-      >
-        <RoundTitle round="turn" />
-        <GameActions
-          round="turn"
-          onNextRound={() => {
-            setTab("river");
-          }}
-        />
-      </Tabs.Content>
+        <Tabs.Content
+          value="turn"
+          className={`p-4 ${tab === "turn" ? "" : "hidden"}`}
+          forceMount
+        >
+          <RoundTitle round="turn" />
+          <GameActions
+            round="turn"
+            onNextRound={() => {
+              setTab("river");
+            }}
+          />
+        </Tabs.Content>
 
-      <Tabs.Content
-        value="river"
-        className={`p-4 ${tab === "river" ? "" : "hidden"}`}
-        forceMount
-      >
-        <RoundTitle round="river" />
-        <GameActions round="river" />
-      </Tabs.Content>
-    </Tabs.Root>
+        <Tabs.Content
+          value="river"
+          className={`p-4 ${tab === "river" ? "" : "hidden"}`}
+          forceMount
+        >
+          <RoundTitle round="river" />
+          <GameActions round="river" />
+        </Tabs.Content>
+      </Tabs.Root>
+    </TableSettingsFrame>
   );
 }

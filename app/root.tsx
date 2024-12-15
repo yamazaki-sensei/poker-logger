@@ -31,10 +31,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <Theme>
           <div className="h-full">
-            <TableSettingsFrame>
-              {children}
-              <ScrollRestoration />
-            </TableSettingsFrame>
+            {children}
+            <ScrollRestoration />
           </div>
         </Theme>
         <Scripts />

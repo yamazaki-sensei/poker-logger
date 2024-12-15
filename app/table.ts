@@ -3,7 +3,7 @@ import { atomWithStorage } from "jotai/utils";
 import { useMemo } from "react";
 import type { Position } from "./types";
 
-interface TableState {
+export interface TableState {
   sb: number;
   bb: number;
   anti: number;

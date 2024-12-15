@@ -9,9 +9,8 @@ import type {
   Position,
 } from "./types";
 import { atom, useAtom } from "jotai";
-import { format } from "date-fns";
 
-interface GameState {
+export interface GameState {
   readonly currentRound: GameRound;
   readonly currentPlayer: Position;
   readonly gameIndex: number;

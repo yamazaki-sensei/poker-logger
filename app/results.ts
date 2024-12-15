@@ -1,7 +1,31 @@
-import { format } from "date-fns";
 import { useCallback } from "react";
-import { useGameState } from "./game";
-import { useTable } from "./table";
+import { useGameState, type GameState } from "./game";
+import { useTable, type TableState } from "./table";
+
+const storeKey = "results";
+
+type GameResult = Omit<
+  GameState,
+  "currentRound" | "currentPlayer" | "activePlayers" | "gameIndex"
+>;
+
+type BoardResult = {
+  game: GameState;
+  table: TableState;
+};
+
+export const loadResults = (): { date: Date; payload: BoardResult }[] => {
+  const results = JSON.parse(localStorage.getItem(storeKey) ?? "[]") as {
+    date: string;
+    payload: BoardResult;
+  }[];
+
+  return results.map((v) => ({
+    date: new Date(v.date),
+    payload: v.payload,
+  }));
+};
+
 export const useResultsWriter = (): {
   storeCurrentBoard: () => void;
 } => {
@@ -9,19 +33,25 @@ export const useResultsWriter = (): {
   const { tableState } = useTable();
 
   const storeCurrentBoard = useCallback(() => {
-    const storeKey = "boards";
     const current = localStorage.getItem(storeKey);
-    const jsonKey = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    const next = {
-      ...JSON.parse(current || "{}"),
-      [jsonKey]: {
-        game: gameState,
-        table: tableState,
-      },
+    const timestamp = new Date().toISOString();
+    const gameResult: GameResult = {
+      myCards: gameState.myCards,
+      actions: gameState.actions,
+      communityCards: gameState.communityCards,
     };
+    const next = [
+      ...JSON.parse(current || "[]"),
+      {
+        date: timestamp,
+        payload: {
+          game: gameResult,
+          table: tableState,
+        },
+      },
+    ];
 
-    console.log(next);
-    console.log(JSON.stringify(next));
+    localStorage.setItem(storeKey, JSON.stringify(next));
   }, [gameState, tableState]);
 
   return {

@@ -19,7 +19,7 @@ import {
 import type { Card, Position } from "./types";
 import { useGameState } from "./game";
 import { Separator } from "./components/ui/separator";
-import { useResultsWriter } from "./results";
+import { loadResults, useResultsWriter } from "./results";
 
 const Footer = () => {
   const { tableState, updateTableState } = useTable();
@@ -202,12 +202,21 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
     <div className="relative w-full h-full pb-[200px]">
       {children}
 
-      <div className="fixed bottom-0 w-full bg-secondary pt-4">
-        <div className="flex justify-end mb-2 mr-2">
-          <Button onClick={storeCurrentBoard} className="mr-4">
-            現在のボードを保存
+      <div className="fixed bottom-0 w-full bg-secondary">
+        <div className="flex p-2">
+          <Button onClick={storeCurrentBoard}>現在のボードを保存</Button>
+          <Button
+            onClick={() => {
+              const results = loadResults();
+              console.log(results);
+            }}
+            className="ml-2"
+          >
+            保存したボードを確認する
           </Button>
-          <Button onClick={resetGameState}>リセット</Button>
+          <div className="flex justify-end flex-1">
+            <Button onClick={resetGameState}>リセット</Button>
+          </div>
         </div>
         <Separator />
         <div className="p-2">
