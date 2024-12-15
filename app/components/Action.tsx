@@ -52,7 +52,7 @@ export const PlayerAction = ({
                 );
               }}
             />
-            <div className="text-xs ml-2">BB</div>
+            <div className="text-xs ml-2">chips</div>
           </div>
         </div>
         <div className="flex items-center">
