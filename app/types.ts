@@ -1,8 +1,7 @@
 export type Position =
   | "UTG"
-  | "UTG+1"
-  | "UTG+2"
-  | "UTG+3"
+  | "UTG1"
+  | "UTG2"
   | "LJ"
   | "HJ"
   | "CO"
@@ -34,3 +33,24 @@ export type Card = {
   number: CardNumber;
   suit: CardSuit;
 };
+
+export type GameRound = "preFlop" | "flop" | "turn" | "river";
+
+export type ActionType = "check" | "fold" | "call" | "raise";
+export type Action =
+  | {
+      type: "check";
+      amount?: undefined;
+    }
+  | {
+      type: "fold";
+      amount?: undefined;
+    }
+  | {
+      type: "call";
+      amount?: undefined;
+    }
+  | {
+      type: "raise";
+      amount: number;
+    };

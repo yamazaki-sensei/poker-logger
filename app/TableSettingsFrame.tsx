@@ -18,6 +18,7 @@ import {
 } from "./components/ui/select";
 import type { Card, Position } from "./types";
 import { useGameState } from "./game";
+import { Separator } from "./components/ui/separator";
 
 const Footer = () => {
   const { tableState, updateTableState } = useTable();
@@ -212,12 +213,16 @@ const Footer = () => {
 };
 
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
+  const { resetGameState } = useGameState();
   return (
     <div className="relative w-full h-full">
       {children}
 
       <div className="fixed bottom-0 w-full">
-        <hr className="w-full" />
+        <div className="flex justify-end mb-2 mr-2">
+          <Button onClick={resetGameState}>リセット</Button>
+        </div>
+        <Separator />
         <div className="p-2">
           <Footer />
         </div>

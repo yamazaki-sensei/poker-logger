@@ -1,6 +1,7 @@
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
-import { GameRound } from "~/components/GameRound";
+import { GameActions } from "~/components/GameActions";
+import { useGameState } from "~/game";
 
 export function meta() {
   return [
@@ -27,6 +28,9 @@ function TabsTrigger({
 }
 
 export default function Home() {
+  const { resetGameState } = useGameState();
+  useEffect(resetGameState, []);
+
   return (
     <Tabs.Root defaultValue="tab1" className="w-full">
       <Tabs.List
@@ -41,7 +45,7 @@ export default function Home() {
 
       <Tabs.Content value="tab1" className="p-4 text-sm">
         <h2 className="text-lg font-semibold mb-2">Pre Flop</h2>
-        <GameRound />
+        <GameActions round="preFlop" />
       </Tabs.Content>
 
       <Tabs.Content value="tab2" className="p-4 text-sm">

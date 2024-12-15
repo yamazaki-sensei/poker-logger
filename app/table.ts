@@ -56,9 +56,9 @@ export const usePositions = (): Position[] => {
       case 7:
         return ["SB", "BB", "UTG", "LJ", "HJ", "CO", "BTN"];
       case 8:
-        return ["SB", "BB", "UTG", "UTG+1", "LJ", "HJ", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "UTG1", "LJ", "HJ", "CO", "BTN"];
       case 9:
-        return ["SB", "BB", "UTG", "UTG+1", "UTG+2", "LJ", "HJ", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "UTG1", "UTG2", "LJ", "HJ", "CO", "BTN"];
       default:
         return ["SB", "BB"];
     }
