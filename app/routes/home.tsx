@@ -1,12 +1,12 @@
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { GameActions } from "~/components/GameActions";
 import { useGameState } from "~/game";
 
 export function meta() {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Poker logger" },
+    { name: "description", content: "For you" },
   ];
 }
 
@@ -30,37 +30,54 @@ function TabsTrigger({
 export default function Home() {
   const { resetGameState } = useGameState();
   useEffect(resetGameState, []);
+  const [tab, setTab] = useState("preFlop");
 
   return (
-    <Tabs.Root defaultValue="tab1" className="w-full">
+    <Tabs.Root value={tab} className="w-full" onValueChange={(v) => setTab(v)}>
       <Tabs.List
         aria-label="Tabs"
         className="flex overflow-x-auto border-b border-gray-300 p-2 gap-2 w-full"
       >
-        <TabsTrigger value="tab1">Pre Flop</TabsTrigger>
-        <TabsTrigger value="tab2">Flop</TabsTrigger>
-        <TabsTrigger value="tab3">Turn</TabsTrigger>
-        <TabsTrigger value="tab4">River</TabsTrigger>
+        <TabsTrigger value="preFlop">Pre Flop</TabsTrigger>
+        <TabsTrigger value="flop">Flop</TabsTrigger>
+        <TabsTrigger value="turn">Turn</TabsTrigger>
+        <TabsTrigger value="river">River</TabsTrigger>
       </Tabs.List>
 
-      <Tabs.Content value="tab1" className="p-4 text-sm">
+      <Tabs.Content
+        value="preFlop"
+        className={`p-4 ${tab === "preFlop" ? "" : "hidden"}`}
+        forceMount
+      >
         <h2 className="text-lg font-semibold mb-2">Pre Flop</h2>
         <GameActions round="preFlop" />
       </Tabs.Content>
 
-      <Tabs.Content value="tab2" className="p-4 text-sm">
+      <Tabs.Content
+        value="flop"
+        className={`p-4 ${tab === "flop" ? "" : "hidden"}`}
+        forceMount
+      >
         <h2 className="text-lg font-semibold mb-2">Flop</h2>
-        <p>ここにタブ2の詳細コンテンツが表示されます。</p>
+        <GameActions round="flop" />
       </Tabs.Content>
 
-      <Tabs.Content value="tab3" className="p-4 text-sm">
+      <Tabs.Content
+        value="turn"
+        className={`p-4 ${tab === "turn" ? "" : "hidden"}`}
+        forceMount
+      >
         <h2 className="text-lg font-semibold mb-2">Turn</h2>
-        <p>ここにタブ3の詳細コンテンツが表示されます。</p>
+        <GameActions round="turn" />
       </Tabs.Content>
 
-      <Tabs.Content value="tab4" className="p-4 text-sm">
+      <Tabs.Content
+        value="river"
+        className={`p-4 ${tab === "river" ? "" : "hidden"}`}
+        forceMount
+      >
         <h2 className="text-lg font-semibold mb-2">River</h2>
-        <p>ここにタブ4の詳細コンテンツが表示されます。</p>
+        <GameActions round="river" />
       </Tabs.Content>
     </Tabs.Root>
   );

@@ -4,11 +4,13 @@ import type { Card, GameRound, Position } from "./types";
 import { atom, useAtom } from "jotai";
 
 interface GameState {
+  currentRound: GameRound;
   myCards: [Card, Card] | undefined;
   currentPlayers: Position[];
 }
 
 const gameAtom = atom<GameState>({
+  currentRound: "preFlop",
   myCards: undefined,
   currentPlayers: [],
 });
@@ -16,6 +18,8 @@ const gameAtom = atom<GameState>({
 export const useGameState = (): {
   gameState: GameState;
   updateGameState: (state: GameState) => void;
+  removePlayer: (position: Position) => void;
+  toNextRound: () => void;
   resetGameState: () => void;
 } => {
   const [gameState, updateGameState] = useAtom(gameAtom);
@@ -46,14 +50,52 @@ export const useGameState = (): {
 
   const resetGameState = useCallback(() => {
     updateGameState({
+      currentRound: "preFlop",
       myCards: undefined,
       currentPlayers: generateInitialPlayers(),
     });
   }, [generateInitialPlayers, updateGameState]);
 
+  const removePlayer = useCallback(
+    (player: Position) => {
+      updateGameState({
+        ...gameState,
+        currentPlayers: gameState.currentPlayers.filter((v) => v !== player),
+      });
+    },
+    [gameState, updateGameState]
+  );
+
+  const toNextRound = useCallback(() => {
+    switch (gameState.currentRound) {
+      case "preFlop":
+        updateGameState({
+          ...gameState,
+          currentRound: "flop",
+        });
+        break;
+      case "flop":
+        updateGameState({
+          ...gameState,
+          currentRound: "turn",
+        });
+        break;
+      case "turn":
+        updateGameState({
+          ...gameState,
+          currentRound: "river",
+        });
+        break;
+      default:
+        throw new Error("Invalid round");
+    }
+  }, [gameState, updateGameState]);
+
   return {
     gameState,
     updateGameState,
+    removePlayer,
+    toNextRound,
     resetGameState,
   };
 };
