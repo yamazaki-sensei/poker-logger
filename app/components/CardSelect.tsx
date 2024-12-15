@@ -1,9 +1,9 @@
-import { cardNumbers, cardSuits, type Card } from "~/game";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Label } from "./ui/label";
 import { suitMark } from "~/utils/card_util";
 import { useState } from "react";
 import { Button } from "./ui/button";
+import { cardNumbers, cardSuits, type Card } from "~/types";
 
 export const CardSelect = ({
   count,

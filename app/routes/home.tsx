@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
+import { GameRound } from "~/components/GameRound";
 
 export function meta() {
   return [
@@ -39,22 +40,22 @@ export default function Home() {
       </Tabs.List>
 
       <Tabs.Content value="tab1" className="p-4 text-sm">
-        <h2 className="text-lg font-semibold mb-2">タブ1のコンテンツ</h2>
-        <p>ここにタブ1の詳細コンテンツが表示されます。</p>
+        <h2 className="text-lg font-semibold mb-2">Pre Flop</h2>
+        <GameRound />
       </Tabs.Content>
 
       <Tabs.Content value="tab2" className="p-4 text-sm">
-        <h2 className="text-lg font-semibold mb-2">タブ2のコンテンツ</h2>
+        <h2 className="text-lg font-semibold mb-2">Flop</h2>
         <p>ここにタブ2の詳細コンテンツが表示されます。</p>
       </Tabs.Content>
 
       <Tabs.Content value="tab3" className="p-4 text-sm">
-        <h2 className="text-lg font-semibold mb-2">タブ3のコンテンツ</h2>
+        <h2 className="text-lg font-semibold mb-2">Turn</h2>
         <p>ここにタブ3の詳細コンテンツが表示されます。</p>
       </Tabs.Content>
 
       <Tabs.Content value="tab4" className="p-4 text-sm">
-        <h2 className="text-lg font-semibold mb-2">タブ4のコンテンツ</h2>
+        <h2 className="text-lg font-semibold mb-2">River</h2>
         <p>ここにタブ4の詳細コンテンツが表示されます。</p>
       </Tabs.Content>
     </Tabs.Root>

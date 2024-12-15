@@ -10,7 +10,7 @@ import { Theme } from "@radix-ui/themes";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
-import { GameSettingsFrame } from "./GameSettingsFrame";
+import { TableSettingsFrame } from "./TableSettingsFrame";
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -31,10 +31,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <body>
         <Theme>
           <div className="h-full">
-            <GameSettingsFrame>
+            <TableSettingsFrame>
               {children}
               <ScrollRestoration />
-            </GameSettingsFrame>
+            </TableSettingsFrame>
           </div>
         </Theme>
         <Scripts />

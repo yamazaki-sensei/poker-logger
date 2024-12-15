@@ -1,14 +1,12 @@
 import { useCallback, useState, type ChangeEvent, type ReactNode } from "react";
-import { useGame, usePositions, type Card, type Position } from "./game";
+import { useTable, usePositions } from "./table";
 import { cardText } from "./utils/card_util";
 import { CardSelect } from "./components/CardSelect";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "./components/ui/dialog";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -16,76 +14,79 @@ import {
   Select,
   SelectItem,
   SelectTrigger,
-  SelectValue,
   SelectContent,
 } from "./components/ui/select";
+import type { Card, Position } from "./types";
+import { useGameState } from "./game";
 
 const Footer = () => {
-  const { gameState, updateGameState } = useGame();
+  const { tableState, updateTableState } = useTable();
+  const { gameState, updateGameState } = useGameState();
+
   const positions = usePositions();
   const onPlayersCountChange = useCallback(
     (v: string) => {
-      updateGameState({
-        ...gameState,
+      updateTableState({
+        ...tableState,
         setting: {
-          ...gameState.setting,
+          ...tableState.setting,
           playersCount: Number.parseInt(v),
         },
       });
     },
-    [gameState, updateGameState]
+    [tableState, updateTableState]
   );
 
   const onPositionChange = useCallback(
     (v: string) => {
-      updateGameState({
-        ...gameState,
+      updateTableState({
+        ...tableState,
         setting: {
-          ...gameState.setting,
+          ...tableState.setting,
           position: v as Position,
         },
       });
     },
-    [gameState, updateGameState]
+    [tableState, updateTableState]
   );
 
   const onSbChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      updateGameState({
-        ...gameState,
+      updateTableState({
+        ...tableState,
         setting: {
-          ...gameState.setting,
+          ...tableState.setting,
           sb: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
-    [gameState, updateGameState]
+    [tableState, updateTableState]
   );
 
   const onBbChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      updateGameState({
-        ...gameState,
+      updateTableState({
+        ...tableState,
         setting: {
-          ...gameState.setting,
+          ...tableState.setting,
           bb: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
-    [gameState, updateGameState]
+    [tableState, updateTableState]
   );
 
   const onAntiChange = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      updateGameState({
-        ...gameState,
+      updateTableState({
+        ...tableState,
         setting: {
-          ...gameState.setting,
+          ...tableState.setting,
           anti: Number.parseInt(event.currentTarget.value || "0"),
         },
       });
     },
-    [gameState, updateGameState]
+    [tableState, updateTableState]
   );
 
   const onCardsChange = useCallback(
@@ -108,13 +109,13 @@ const Footer = () => {
           <div className="text-sm">人数:</div>
           <div className="ml-2">
             <Select
-              value={`${gameState.setting.playersCount}`}
+              value={`${tableState.setting.playersCount}`}
               onValueChange={onPlayersCountChange}
             >
               <SelectTrigger>
                 <div className="flex items-center">
                   <span className="ml-1">
-                    {gameState.setting.playersCount}人
+                    {tableState.setting.playersCount}人
                   </span>
                 </div>
               </SelectTrigger>
@@ -132,11 +133,11 @@ const Footer = () => {
           <div className="text-sm">ポジション:</div>
           <div className="ml-2">
             <Select
-              value={`${gameState.setting.position}`}
+              value={`${tableState.setting.position}`}
               onValueChange={onPositionChange}
             >
               <SelectTrigger className="flex items-center">
-                <span className="ml-1">{gameState.setting.position}</span>
+                <span className="ml-1">{tableState.setting.position}</span>
               </SelectTrigger>
               <SelectContent align="center" position="popper">
                 {positions.map((v) => (
@@ -178,7 +179,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${gameState.setting.sb}`.replace(/^0+/, "") || "0"}
+              value={`${tableState.setting.sb}`.replace(/^0+/, "") || "0"}
               onChange={onSbChange}
             />
           </div>
@@ -188,7 +189,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${gameState.setting.bb}`.replace(/^0+/, "") || "0"}
+              value={`${tableState.setting.bb}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onBbChange}
             />
@@ -199,7 +200,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${gameState.setting.anti}`.replace(/^0+/, "") || "0"}
+              value={`${tableState.setting.anti}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onAntiChange}
             />
@@ -210,7 +211,7 @@ const Footer = () => {
   );
 };
 
-export const GameSettingsFrame = ({ children }: { children: ReactNode }) => {
+export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   return (
     <div className="relative w-full h-full">
       {children}

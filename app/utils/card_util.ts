@@ -1,4 +1,4 @@
-import type { Card, CardSuit } from "~/game";
+import type { Card, CardSuit } from "~/types";
 
 export function cardText(card: Card): string {
   switch (card.suit) {
