@@ -4,6 +4,7 @@ import { suitMark } from "~/utils/card_util";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { cardNumbers, cardSuits, type Card } from "~/types";
+import { Separator } from "./ui/separator";
 
 export const CardSelect = ({
   count,
@@ -64,6 +65,7 @@ export const CardSelect = ({
                   </div>
                 ))}
               </RadioGroup>
+              <Separator className="mt-4" />
             </div>
           ))}
       </div>

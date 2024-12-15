@@ -4,6 +4,7 @@ import type { GameRound, Action } from "~/types";
 import { PlayerAction } from "./Action";
 import { actionToText } from "~/utils/action_util";
 import { Button } from "./ui/button";
+import { gameRoundText } from "~/utils/round_util";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
@@ -18,7 +19,7 @@ const ActionArea = ({ round }: { round: GameRound }) => {
     return <div>全員foldしました</div>;
   }
   if (gameState.currentRound !== round) {
-    return <div>{`現在は ${gameState.currentRound} です`}</div>;
+    return <div>{`現在は ${gameRoundText(gameState.currentRound)} です`}</div>;
   }
 
   return (

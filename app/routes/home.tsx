@@ -1,7 +1,18 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { use, useEffect, useState, type ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { GameActions } from "~/components/GameActions";
 import { useGameState } from "~/game";
+import type { Card, GameRound } from "~/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { Button } from "~/components/ui/button";
+import { cardText } from "~/utils/card_util";
+import { CardSelect } from "~/components/CardSelect";
+import { gameRoundText } from "~/utils/round_util";
 
 export function meta() {
   return [
@@ -26,6 +37,43 @@ function TabsTrigger({
     </Tabs.Trigger>
   );
 }
+
+const RoundTitle = ({ round }: { round: GameRound }) => {
+  const [cardsDialogOpened, setCardsDialogOpened] = useState(false);
+  const { gameState, setCommunityCards } = useGameState();
+  if (round === "preFlop") {
+    return (
+      <h2 className="text-lg font-semibold mb-2">{gameRoundText(round)}</h2>
+    );
+  }
+
+  const current = gameState.communityCards[round];
+  const cardsCount = round === "flop" ? 3 : 1;
+  const onCardsChange = (cards: Card[]) => {
+    setCardsDialogOpened(false);
+    setCommunityCards(round, cards);
+  };
+
+  return (
+    <div className="flex items-center">
+      <h2 className="text-lg font-semibold mb-2">{gameRoundText(round)}</h2>
+      <div className="ml-2 mb-2">
+        <Dialog open={cardsDialogOpened} onOpenChange={setCardsDialogOpened}>
+          <Button variant="outline" onClick={() => setCardsDialogOpened(true)}>
+            {current
+              ? current.map((v) => cardText(v)).join(" ")
+              : "コミュニティカードを設定する"}
+          </Button>
+          <DialogContent>
+            <DialogTitle>{`${gameRoundText(round)}`}</DialogTitle>
+            <DialogDescription>コミュニティカードを選択</DialogDescription>
+            <CardSelect count={cardsCount} onSelect={onCardsChange} />
+          </DialogContent>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
 
 export default function Home() {
   const { gameState, resetGameState } = useGameState();
@@ -55,7 +103,7 @@ export default function Home() {
         className={`p-4 ${tab === "preFlop" ? "" : "hidden"}`}
         forceMount
       >
-        <h2 className="text-lg font-semibold mb-2">Pre Flop</h2>
+        <RoundTitle round="preFlop" />
         <GameActions
           round="preFlop"
           onNextRound={() => {
@@ -69,7 +117,7 @@ export default function Home() {
         className={`p-4 ${tab === "flop" ? "" : "hidden"}`}
         forceMount
       >
-        <h2 className="text-lg font-semibold mb-2">Flop</h2>
+        <RoundTitle round="flop" />
         <GameActions
           round="flop"
           onNextRound={() => {
@@ -83,7 +131,7 @@ export default function Home() {
         className={`p-4 ${tab === "turn" ? "" : "hidden"}`}
         forceMount
       >
-        <h2 className="text-lg font-semibold mb-2">Turn</h2>
+        <RoundTitle round="turn" />
         <GameActions
           round="turn"
           onNextRound={() => {
@@ -97,7 +145,7 @@ export default function Home() {
         className={`p-4 ${tab === "river" ? "" : "hidden"}`}
         forceMount
       >
-        <h2 className="text-lg font-semibold mb-2">River</h2>
+        <RoundTitle round="river" />
         <GameActions round="river" />
       </Tabs.Content>
     </Tabs.Root>

@@ -22,6 +22,11 @@ interface GameState {
     readonly turn: { player: Position; action: Action }[];
     readonly river: { player: Position; action: Action }[];
   };
+  readonly communityCards: {
+    flop: [Card, Card, Card] | undefined;
+    turn: [Card] | undefined;
+    river: [Card] | undefined;
+  };
 }
 
 const gameAtom = atom<GameState>({
@@ -36,6 +41,11 @@ const gameAtom = atom<GameState>({
     turn: [],
     river: [],
   },
+  communityCards: {
+    flop: undefined,
+    turn: undefined,
+    river: undefined,
+  },
 });
 
 export const useGameState = (): {
@@ -43,6 +53,7 @@ export const useGameState = (): {
   setMyCards: (cards: [Card, Card]) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
+  setCommunityCards: (round: GameRound, cards: Card[]) => void;
   resetGameState: () => void;
 } => {
   const [gameState, setGameState] = useAtom(gameAtom);
@@ -73,6 +84,11 @@ export const useGameState = (): {
         turn: [],
         river: [],
       },
+      communityCards: {
+        flop: undefined,
+        turn: undefined,
+        river: undefined,
+      },
     }));
   }, [tableState.playersCount, setGameState]);
 
@@ -98,6 +114,19 @@ export const useGameState = (): {
       });
     },
     [gameState, gameState.actions, setGameState]
+  );
+
+  const setCommunityCards = useCallback(
+    (round: GameRound, cards: Card[]) => {
+      setGameState({
+        ...gameState,
+        communityCards: {
+          ...gameState.communityCards,
+          [round]: cards,
+        },
+      });
+    },
+    [gameState, gameState.communityCards, setGameState]
   );
 
   const toNextRound = useCallback(() => {
@@ -136,6 +165,7 @@ export const useGameState = (): {
     gameState,
     setMyCards,
     commitAction,
+    setCommunityCards,
     toNextRound,
     resetGameState,
   };
