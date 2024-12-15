@@ -9,12 +9,14 @@ type GameResult = Omit<
   "currentRound" | "currentPlayer" | "activePlayers" | "gameIndex"
 >;
 
-type BoardResult = {
+export type BoardResult = {
   game: GameState;
   table: TableState;
 };
 
-export const loadResults = (): { date: Date; payload: BoardResult }[] => {
+export const loadResults = async (): Promise<
+  { date: Date; payload: BoardResult }[]
+> => {
   const results = JSON.parse(localStorage.getItem(storeKey) ?? "[]") as {
     date: string;
     payload: BoardResult;

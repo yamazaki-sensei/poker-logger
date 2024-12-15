@@ -10,7 +10,6 @@ import { Theme } from "@radix-ui/themes";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
-import { TableSettingsFrame } from "./TableSettingsFrame";
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
