@@ -23,7 +23,8 @@ import { loadResults, useResultsWriter } from "./results";
 
 const Footer = () => {
   const { tableState, updateTableState } = useTable();
-  const { gameState, setMyCards } = useGameState();
+  const { gameState, setMyCards, setMyPosition, resetGameState } =
+    useGameState();
 
   const positions = usePositions();
   const onPlayersCountChange = useCallback(
@@ -33,17 +34,14 @@ const Footer = () => {
         playersCount: Number.parseInt(v),
       });
     },
-    [tableState, updateTableState]
+    [tableState, updateTableState, resetGameState]
   );
 
   const onPositionChange = useCallback(
     (v: string) => {
-      updateTableState({
-        ...tableState,
-        position: v as Position,
-      });
+      setMyPosition(v as Position);
     },
-    [tableState, updateTableState]
+    [setMyPosition]
   );
 
   const onSbChange = useCallback(
@@ -94,7 +92,10 @@ const Footer = () => {
           <div className="ml-2">
             <Select
               value={`${tableState.playersCount}`}
-              onValueChange={onPlayersCountChange}
+              onValueChange={(v) => {
+                onPlayersCountChange(v);
+                resetGameState();
+              }}
             >
               <SelectTrigger>
                 <div className="flex items-center">
@@ -115,11 +116,11 @@ const Footer = () => {
           <div className="text-sm">ポジション:</div>
           <div className="ml-2">
             <Select
-              value={`${tableState.position}`}
+              value={`${gameState.myPosition}`}
               onValueChange={onPositionChange}
             >
               <SelectTrigger className="flex items-center">
-                <span className="ml-1">{tableState.position}</span>
+                <span className="ml-1">{gameState.myPosition}</span>
               </SelectTrigger>
               <SelectContent align="center" position="popper">
                 {positions.map((v) => (
@@ -202,6 +203,9 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
     <div className="relative w-full h-full pb-[200px]">
       {children}
 
+      <div className="flex justify-end flex-1 p-4">
+        <Button onClick={resetGameState}>リセット</Button>
+      </div>
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">
           <Button onClick={storeCurrentBoard}>現在のボードを保存</Button>
@@ -212,11 +216,8 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
             }}
             className="ml-2"
           >
-            保存したボードを確認する
+            保存したボードを確認
           </Button>
-          <div className="flex justify-end flex-1">
-            <Button onClick={resetGameState}>リセット</Button>
-          </div>
         </div>
         <Separator />
         <div className="p-2">

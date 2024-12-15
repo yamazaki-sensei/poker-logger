@@ -5,6 +5,7 @@ import { PlayerAction } from "./Action";
 import { actionToText } from "~/utils/action_util";
 import { Button } from "./ui/button";
 import { gameRoundText } from "~/utils/round_util";
+import { PositionText } from "./PositionText";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
@@ -44,9 +45,12 @@ export const GameActions = ({
 
   return (
     <div>
-      <div>{`Active ${
-        gameState.activePlayers.length
-      }: ${gameState.activePlayers.join(", ")}`}</div>
+      <div>{`Active ${gameState.activePlayers.length}:`}</div>
+      <div>
+        {gameState.activePlayers.map((v) => (
+          <PositionText key={v} position={v} className="mr-2" />
+        ))}
+      </div>
       <div className="mt-3">
         {actions.map(({ player, action }, i) => (
           <div

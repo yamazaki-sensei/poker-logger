@@ -11,21 +11,25 @@ export const PlayerAction = ({
   const [raiseAmount, setRaiseAmount] = useState<number>(0);
 
   return (
-    <div className="items-center flex justify-between">
+    <div className="grid grid-cols-3 gap-2">
       <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "check" })} className="p-1">
+        <Button onClick={() => onAction({ type: "check" })} className="w-full">
           Check
         </Button>
       </div>
       <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "call" })} className="p-1">
+        <Button onClick={() => onAction({ type: "call" })} className="w-full">
           Call
+        </Button>
+      </div>
+      <div className="flex items-center">
+        <Button onClick={() => onAction({ type: "fold" })} className="w-full">
+          Fold
         </Button>
       </div>
       <div className="flex items-center">
         <Button
           onClick={() => onAction({ type: "raise", amount: raiseAmount })}
-          className="p-1"
         >
           Bet / Raise
         </Button>
@@ -35,18 +39,13 @@ export const PlayerAction = ({
             type="number"
             min={0}
             size={1}
-            className="w-24"
+            className="w-16"
             onChange={(event) => {
               setRaiseAmount(Number.parseInt(event.currentTarget.value || "0"));
             }}
           />
           <div className="text-xs ml-2">chips</div>
         </div>
-      </div>
-      <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "fold" })} className="p-1">
-          Fold
-        </Button>
       </div>
     </div>
   );

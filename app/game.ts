@@ -13,6 +13,7 @@ import { atom, useAtom } from "jotai";
 export interface GameState {
   readonly currentRound: GameRound;
   readonly currentPlayer: Position;
+  readonly myPosition: Position;
   readonly gameIndex: number;
   readonly myCards: [Card, Card] | undefined;
   readonly activePlayers: Position[];
@@ -32,6 +33,7 @@ export interface GameState {
 const gameAtom = atom<GameState>({
   currentRound: "preFlop",
   currentPlayer: "UTG",
+  myPosition: "UTG",
   myCards: undefined,
   activePlayers: [],
   gameIndex: 0,
@@ -51,6 +53,7 @@ const gameAtom = atom<GameState>({
 export const useGameState = (): {
   readonly gameState: GameState;
   setMyCards: (cards: [Card, Card]) => void;
+  setMyPosition: (position: Position) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
   setCommunityCards: (round: GameRound, cards: Card[]) => void;
@@ -69,10 +72,21 @@ export const useGameState = (): {
     [gameState, setGameState]
   );
 
+  const setMyPosition = useCallback(
+    (position: Position) => {
+      setGameState({
+        ...gameState,
+        myPosition: position,
+      });
+    },
+    [gameState, setGameState]
+  );
+
   const resetGameState = useCallback(() => {
     setGameState((prev) => ({
       currentRound: "preFlop",
       currentPlayer: findFirstPlayer(tableState.playersCount),
+      myPosition: prev.myPosition,
       gameIndex: prev.gameIndex + 1,
       myCards: undefined,
       activePlayers: sortPlayersToPreFlopOrder(
@@ -164,6 +178,7 @@ export const useGameState = (): {
   return {
     gameState,
     setMyCards,
+    setMyPosition,
     commitAction,
     setCommunityCards,
     toNextRound,

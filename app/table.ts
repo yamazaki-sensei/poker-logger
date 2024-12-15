@@ -4,11 +4,10 @@ import { useMemo } from "react";
 import type { Position } from "./types";
 
 export interface TableState {
-  sb: number;
-  bb: number;
-  anti: number;
-  playersCount: number;
-  position: Position;
+  readonly sb: number;
+  readonly bb: number;
+  readonly anti: number;
+  readonly playersCount: number;
 }
 
 const initialTableState: TableState = {
@@ -16,7 +15,6 @@ const initialTableState: TableState = {
   bb: 0,
   anti: 0,
   playersCount: 9,
-  position: "UTG",
 };
 
 const tableAtom = atomWithStorage("TableState", initialTableState);

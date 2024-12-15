@@ -39,6 +39,7 @@ export const useResultsWriter = (): {
     const timestamp = new Date().toISOString();
     const gameResult: GameResult = {
       myCards: gameState.myCards,
+      myPosition: gameState.myPosition,
       actions: gameState.actions,
       communityCards: gameState.communityCards,
     };
