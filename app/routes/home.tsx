@@ -90,7 +90,7 @@ export default function Home() {
     <Tabs.Root value={tab} className="w-full" onValueChange={(v) => setTab(v)}>
       <Tabs.List
         aria-label="Tabs"
-        className="flex overflow-x-auto border-b border-gray-300 p-2 gap-2 w-full"
+        className="flex overflow-x-auto border-b border-gray-300 p-2 gap-2 w-full sticky top-0 bg-secondary"
       >
         <TabsTrigger value="preFlop">Pre Flop</TabsTrigger>
         <TabsTrigger value="flop">Flop</TabsTrigger>

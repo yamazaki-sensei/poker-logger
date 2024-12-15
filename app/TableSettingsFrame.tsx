@@ -196,10 +196,10 @@ const Footer = () => {
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   const { resetGameState } = useGameState();
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full pb-[200px]">
       {children}
 
-      <div className="fixed bottom-0 w-full">
+      <div className="fixed bottom-0 w-full bg-secondary pt-4">
         <div className="flex justify-end mb-2 mr-2">
           <Button onClick={resetGameState}>リセット</Button>
         </div>
