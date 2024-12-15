@@ -22,17 +22,14 @@ import { Separator } from "./components/ui/separator";
 
 const Footer = () => {
   const { tableState, updateTableState } = useTable();
-  const { gameState, updateGameState } = useGameState();
+  const { gameState, setMyCards } = useGameState();
 
   const positions = usePositions();
   const onPlayersCountChange = useCallback(
     (v: string) => {
       updateTableState({
         ...tableState,
-        setting: {
-          ...tableState.setting,
-          playersCount: Number.parseInt(v),
-        },
+        playersCount: Number.parseInt(v),
       });
     },
     [tableState, updateTableState]
@@ -42,10 +39,7 @@ const Footer = () => {
     (v: string) => {
       updateTableState({
         ...tableState,
-        setting: {
-          ...tableState.setting,
-          position: v as Position,
-        },
+        position: v as Position,
       });
     },
     [tableState, updateTableState]
@@ -55,10 +49,7 @@ const Footer = () => {
     (event: ChangeEvent<HTMLInputElement>) => {
       updateTableState({
         ...tableState,
-        setting: {
-          ...tableState.setting,
-          sb: Number.parseInt(event.currentTarget.value || "0"),
-        },
+        sb: Number.parseInt(event.currentTarget.value || "0"),
       });
     },
     [tableState, updateTableState]
@@ -68,10 +59,7 @@ const Footer = () => {
     (event: ChangeEvent<HTMLInputElement>) => {
       updateTableState({
         ...tableState,
-        setting: {
-          ...tableState.setting,
-          bb: Number.parseInt(event.currentTarget.value || "0"),
-        },
+        bb: Number.parseInt(event.currentTarget.value || "0"),
       });
     },
     [tableState, updateTableState]
@@ -81,10 +69,7 @@ const Footer = () => {
     (event: ChangeEvent<HTMLInputElement>) => {
       updateTableState({
         ...tableState,
-        setting: {
-          ...tableState.setting,
-          anti: Number.parseInt(event.currentTarget.value || "0"),
-        },
+        anti: Number.parseInt(event.currentTarget.value || "0"),
       });
     },
     [tableState, updateTableState]
@@ -93,12 +78,9 @@ const Footer = () => {
   const onCardsChange = useCallback(
     (cards: Card[]) => {
       setCardSelectDialogOpened(false);
-      updateGameState({
-        ...gameState,
-        myCards: cards as [Card, Card],
-      });
+      setMyCards(cards as [Card, Card]);
     },
-    [gameState, updateGameState]
+    [setMyCards]
   );
 
   const [cardSelectDialogOpened, setCardSelectDialogOpened] = useState(false);
@@ -110,14 +92,12 @@ const Footer = () => {
           <div className="text-sm">人数:</div>
           <div className="ml-2">
             <Select
-              value={`${tableState.setting.playersCount}`}
+              value={`${tableState.playersCount}`}
               onValueChange={onPlayersCountChange}
             >
               <SelectTrigger>
                 <div className="flex items-center">
-                  <span className="ml-1">
-                    {tableState.setting.playersCount}人
-                  </span>
+                  <span className="ml-1">{tableState.playersCount}人</span>
                 </div>
               </SelectTrigger>
               <SelectContent position="popper">
@@ -134,11 +114,11 @@ const Footer = () => {
           <div className="text-sm">ポジション:</div>
           <div className="ml-2">
             <Select
-              value={`${tableState.setting.position}`}
+              value={`${tableState.position}`}
               onValueChange={onPositionChange}
             >
               <SelectTrigger className="flex items-center">
-                <span className="ml-1">{tableState.setting.position}</span>
+                <span className="ml-1">{tableState.position}</span>
               </SelectTrigger>
               <SelectContent align="center" position="popper">
                 {positions.map((v) => (
@@ -180,7 +160,8 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${tableState.setting.sb}`.replace(/^0+/, "") || "0"}
+              type="number"
+              value={`${tableState.sb}`.replace(/^0+/, "") || "0"}
               onChange={onSbChange}
             />
           </div>
@@ -190,7 +171,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${tableState.setting.bb}`.replace(/^0+/, "") || "0"}
+              value={`${tableState.bb}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onBbChange}
             />
@@ -201,7 +182,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${tableState.setting.anti}`.replace(/^0+/, "") || "0"}
+              value={`${tableState.anti}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onAntiChange}
             />

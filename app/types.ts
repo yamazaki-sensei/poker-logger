@@ -54,3 +54,8 @@ export type Action =
       type: "raise";
       amount: number;
     };
+
+export type ActionWithPlayer = {
+  player: Position;
+  action: Action;
+};

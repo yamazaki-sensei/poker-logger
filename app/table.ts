@@ -4,23 +4,19 @@ import { useMemo } from "react";
 import type { Position } from "./types";
 
 interface TableState {
-  setting: {
-    sb: number;
-    bb: number;
-    anti: number;
-    playersCount: number;
-    position: Position;
-  };
+  sb: number;
+  bb: number;
+  anti: number;
+  playersCount: number;
+  position: Position;
 }
 
 const initialTableState: TableState = {
-  setting: {
-    sb: 0,
-    bb: 0,
-    anti: 0,
-    playersCount: 9,
-    position: "UTG",
-  },
+  sb: 0,
+  bb: 0,
+  anti: 0,
+  playersCount: 9,
+  position: "UTG",
 };
 
 const tableAtom = atomWithStorage("TableState", initialTableState);
@@ -39,7 +35,7 @@ export const useTable = (): {
 
 export const usePositions = (): Position[] => {
   const { tableState } = useTable();
-  const playersCount = tableState.setting.playersCount;
+  const playersCount = tableState.playersCount;
 
   return useMemo(() => {
     switch (playersCount) {

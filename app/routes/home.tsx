@@ -28,9 +28,15 @@ function TabsTrigger({
 }
 
 export default function Home() {
-  const { resetGameState } = useGameState();
+  const { gameState, resetGameState } = useGameState();
   useEffect(resetGameState, []);
   const [tab, setTab] = useState("preFlop");
+
+  useEffect(() => {
+    if (gameState.gameIndex > 0) {
+      setTab("preFlop");
+    }
+  }, [gameState.gameIndex]);
 
   return (
     <Tabs.Root value={tab} className="w-full" onValueChange={(v) => setTab(v)}>
@@ -50,7 +56,12 @@ export default function Home() {
         forceMount
       >
         <h2 className="text-lg font-semibold mb-2">Pre Flop</h2>
-        <GameActions round="preFlop" />
+        <GameActions
+          round="preFlop"
+          onNextRound={() => {
+            setTab("flop");
+          }}
+        />
       </Tabs.Content>
 
       <Tabs.Content
@@ -59,7 +70,12 @@ export default function Home() {
         forceMount
       >
         <h2 className="text-lg font-semibold mb-2">Flop</h2>
-        <GameActions round="flop" />
+        <GameActions
+          round="flop"
+          onNextRound={() => {
+            setTab("turn");
+          }}
+        />
       </Tabs.Content>
 
       <Tabs.Content
@@ -68,7 +84,12 @@ export default function Home() {
         forceMount
       >
         <h2 className="text-lg font-semibold mb-2">Turn</h2>
-        <GameActions round="turn" />
+        <GameActions
+          round="turn"
+          onNextRound={() => {
+            setTab("river");
+          }}
+        />
       </Tabs.Content>
 
       <Tabs.Content

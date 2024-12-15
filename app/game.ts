@@ -1,100 +1,141 @@
+"use client";
 import { useCallback } from "react";
 import { useTable } from "./table";
-import type { Card, GameRound, Position } from "./types";
+import type {
+  Action,
+  ActionWithPlayer,
+  Card,
+  GameRound,
+  Position,
+} from "./types";
 import { atom, useAtom } from "jotai";
 
 interface GameState {
-  currentRound: GameRound;
-  myCards: [Card, Card] | undefined;
-  currentPlayers: Position[];
+  readonly currentRound: GameRound;
+  readonly currentPlayer: Position;
+  readonly gameIndex: number;
+  readonly myCards: [Card, Card] | undefined;
+  readonly activePlayers: Position[];
+  readonly actions: {
+    readonly preFlop: { player: Position; action: Action }[];
+    readonly flop: { player: Position; action: Action }[];
+    readonly turn: { player: Position; action: Action }[];
+    readonly river: { player: Position; action: Action }[];
+  };
 }
 
 const gameAtom = atom<GameState>({
   currentRound: "preFlop",
+  currentPlayer: "UTG",
   myCards: undefined,
-  currentPlayers: [],
+  activePlayers: [],
+  gameIndex: 0,
+  actions: {
+    preFlop: [],
+    flop: [],
+    turn: [],
+    river: [],
+  },
 });
 
 export const useGameState = (): {
-  gameState: GameState;
-  updateGameState: (state: GameState) => void;
-  removePlayer: (position: Position) => void;
+  readonly gameState: GameState;
+  setMyCards: (cards: [Card, Card]) => void;
+  commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
   resetGameState: () => void;
 } => {
-  const [gameState, updateGameState] = useAtom(gameAtom);
+  const [gameState, setGameState] = useAtom(gameAtom);
   const { tableState } = useTable();
 
-  const generateInitialPlayers = useCallback((): Position[] => {
-    switch (tableState.setting.playersCount) {
-      case 2:
-        return ["SB", "BB"];
-      case 3:
-        return ["SB", "BB", "BTN"];
-      case 4:
-        return ["SB", "BB", "CO", "BTN"];
-      case 5:
-        return ["SB", "BB", "HJ", "CO", "BTN"];
-      case 6:
-        return ["SB", "BB", "LJ", "HJ", "CO", "BTN"];
-      case 7:
-        return ["SB", "BB", "UTG", "LJ", "HJ", "CO", "BTN"];
-      case 8:
-        return ["SB", "BB", "UTG", "UTG1", "LJ", "HJ", "CO", "BTN"];
-      case 9:
-        return ["SB", "BB", "UTG", "UTG1", "UTG2", "LJ", "HJ", "CO", "BTN"];
-      default:
-        throw new Error("Invalid players count");
-    }
-  }, [tableState.setting.playersCount]);
-
-  const resetGameState = useCallback(() => {
-    updateGameState({
-      currentRound: "preFlop",
-      myCards: undefined,
-      currentPlayers: generateInitialPlayers(),
-    });
-  }, [generateInitialPlayers, updateGameState]);
-
-  const removePlayer = useCallback(
-    (player: Position) => {
-      updateGameState({
+  const setMyCards = useCallback(
+    (cards: [Card, Card]) => {
+      setGameState({
         ...gameState,
-        currentPlayers: gameState.currentPlayers.filter((v) => v !== player),
+        myCards: cards,
       });
     },
-    [gameState, updateGameState]
+    [gameState, setGameState]
+  );
+
+  const resetGameState = useCallback(() => {
+    setGameState((prev) => ({
+      currentRound: "preFlop",
+      currentPlayer: findFirstPlayer(tableState.playersCount),
+      gameIndex: prev.gameIndex + 1,
+      myCards: undefined,
+      activePlayers: sortPlayersToPreFlopOrder(
+        generateInitialPlayers(tableState.playersCount)
+      ),
+      actions: {
+        preFlop: [],
+        flop: [],
+        turn: [],
+        river: [],
+      },
+    }));
+  }, [tableState.playersCount, setGameState]);
+
+  const commitAction = useCallback(
+    (round: GameRound, action: ActionWithPlayer) => {
+      const nextPlayers =
+        action.action.type === "fold"
+          ? gameState.activePlayers.filter((v) => v !== action.player)
+          : gameState.activePlayers;
+
+      setGameState({
+        ...gameState,
+        actions: {
+          ...gameState.actions,
+          [round]: [...gameState.actions[round], action],
+        },
+        activePlayers: nextPlayers,
+        currentPlayer: findNextPlayer({
+          round: gameState.currentRound,
+          currentPlayer: gameState.currentPlayer,
+          activePlayers: gameState.activePlayers,
+        }),
+      });
+    },
+    [gameState, gameState.actions, setGameState]
   );
 
   const toNextRound = useCallback(() => {
+    const activePlayers = sortPlayersToGeneralOrder(gameState.activePlayers);
     switch (gameState.currentRound) {
       case "preFlop":
-        updateGameState({
+        setGameState({
           ...gameState,
           currentRound: "flop",
+          activePlayers,
+          currentPlayer: activePlayers[0],
         });
         break;
       case "flop":
-        updateGameState({
+        setGameState({
           ...gameState,
           currentRound: "turn",
+          activePlayers,
+          currentPlayer: activePlayers[0],
         });
         break;
       case "turn":
-        updateGameState({
+        setGameState({
           ...gameState,
           currentRound: "river",
+          activePlayers,
+          currentPlayer: activePlayers[0],
         });
         break;
       default:
         throw new Error("Invalid round");
     }
-  }, [gameState, updateGameState]);
+  }, [gameState, setGameState]);
 
   return {
     gameState,
-    updateGameState,
-    removePlayer,
+    setMyCards,
+    commitAction,
     toNextRound,
     resetGameState,
   };
@@ -110,7 +151,7 @@ const playOrder = {
   HJ: 6,
   CO: 7,
   BTN: 8,
-} satisfies Record<Position, number>;
+} as const satisfies Record<Position, number>;
 
 const preFlopPlayOrder = {
   UTG: 0,
@@ -122,39 +163,77 @@ const preFlopPlayOrder = {
   BTN: 6,
   SB: 7,
   BB: 8,
-} satisfies Record<Position, number>;
+} as const satisfies Record<Position, number>;
 
-export const useNextPlayer = (
-  round: GameRound,
-  currentPlayer: Position | undefined
-): Position | undefined => {
-  const { gameState } = useGameState();
-
-  if (currentPlayer === undefined) {
-    if (round === "preFlop") {
-      return gameState.currentPlayers.sort(
-        (v1, v2) => preFlopPlayOrder[v1] - preFlopPlayOrder[v2]
-      )[0];
-    }
-
-    return gameState.currentPlayers.sort(
-      (v1, v2) => playOrder[v1] - playOrder[v2]
-    )[0];
-  }
-
-  if (round === "preFlop") {
-    const currentPlayerIndex = preFlopPlayOrder[currentPlayer];
-    const nextPlayer = gameState.currentPlayers.find(
-      (player) => preFlopPlayOrder[player] > currentPlayerIndex
-    );
-
-    return nextPlayer ?? gameState.currentPlayers[0];
-  }
-
-  const currentPlayerIndex = playOrder[currentPlayer];
-  const nextPlayer = gameState.currentPlayers.find(
-    (player) => playOrder[player] > currentPlayerIndex
+const sortPlayersToPreFlopOrder = (
+  players: readonly Position[]
+): Position[] => {
+  return players.toSorted(
+    (v1, v2) => preFlopPlayOrder[v1] - preFlopPlayOrder[v2]
   );
+};
 
-  return nextPlayer ?? gameState.currentPlayers[0];
+const sortPlayersToGeneralOrder = (
+  players: readonly Position[]
+): Position[] => {
+  return players.toSorted((v1, v2) => playOrder[v1] - playOrder[v2]);
+};
+
+const findNextPlayer = ({
+  round,
+  currentPlayer,
+  activePlayers,
+}: {
+  readonly round: GameRound;
+  readonly currentPlayer: Position;
+  readonly activePlayers: readonly Position[];
+}): Position => {
+  if (round === "preFlop") {
+    const sorted = sortPlayersToPreFlopOrder(activePlayers);
+    const currentPlayerIndex = preFlopPlayOrder[currentPlayer];
+    return (
+      sorted.find((player) => preFlopPlayOrder[player] > currentPlayerIndex) ||
+      sorted[0]
+    );
+  }
+
+  const sorted = sortPlayersToGeneralOrder(activePlayers);
+  const currentPlayerIndex = playOrder[currentPlayer];
+  return (
+    sorted.find((player) => playOrder[player] > currentPlayerIndex) || sorted[0]
+  );
+};
+
+const findFirstPlayer = (playersCount: number): Position => {
+  switch (playersCount) {
+    case 2:
+      return "SB";
+    case 3:
+      return "BTN";
+    default:
+      return "UTG";
+  }
+};
+
+const generateInitialPlayers = (playersCount: number): Position[] => {
+  switch (playersCount) {
+    case 2:
+      return ["SB", "BB"];
+    case 3:
+      return ["BTN", "SB", "BB"];
+    case 4:
+      return ["UTG", "BTN", "SB", "BB"];
+    case 5:
+      return ["UTG", "CO", "BTN", "SB", "BB"];
+    case 6:
+      return ["UTG", "HJ", "CO", "BTN", "SB", "BB"];
+    case 7:
+      return ["UTG", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+    case 8:
+      return ["UTG", "UTG1", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+    case 9:
+      return ["UTG", "UTG1", "UTG2", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+    default:
+      throw new Error("Invalid players count");
+  }
 };
