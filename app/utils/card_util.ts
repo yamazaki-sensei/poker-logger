@@ -5,9 +5,9 @@ export function cardText(card: Card): string {
     case "c":
       return `${card.number}♣`;
     case "d":
-      return `${card.number}♦`;
+      return `${card.number}♢`;
     case "h":
-      return `${card.number}♥`;
+      return `${card.number}♡`;
     case "s":
       return `${card.number}♠`;
   }
@@ -18,9 +18,9 @@ export function suitMark(suit: CardSuit): string {
     case "c":
       return "♣";
     case "d":
-      return "♦";
+      return "♢";
     case "h":
-      return "♥︎";
+      return "︎♡";
     case "s":
       return "♠";
   }
