@@ -44,7 +44,7 @@ export const useResultsWriter = (): {
       myPosition: gameState.myPosition,
       actions: gameState.actions,
       communityCards: gameState.communityCards,
-      hands: gameState.hands,
+      playersState: gameState.playersState,
     };
     const next = [
       ...JSON.parse(current || "[]"),

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { use, useState } from "react";
 import { useGameState } from "~/game";
 import type { GameRound, Action, Position, Card } from "~/types";
 import { PlayerAction } from "./Action";
@@ -20,6 +20,7 @@ import {
 } from "./ui/dialog";
 import { CardSelect } from "./CardSelect";
 import { cardText } from "~/utils/card_util";
+import { Input } from "./ui/input";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
@@ -51,38 +52,59 @@ export const GameActions = ({
   round: GameRound;
   onNextRound?: () => void;
 }) => {
-  const { gameState, toNextRound, setHands } = useGameState();
+  const { gameState, toNextRound, updatePlayerState } = useGameState();
   const actions = gameState.actions[round];
   const [handsSelectTarget, setHandsSelectTarget] = useState<Position>();
   const handleHandSelectTarget = (position: Position) => {
     setHandsSelectTarget(position);
   };
-  const handleHands = (hands: Card[]) => {
+  const handleHands = (hands: Card[], stack: number | undefined) => {
     if (!handsSelectTarget) {
       return;
     }
-    setHands(handsSelectTarget, [hands[0], hands[1]]);
+    updatePlayerState(handsSelectTarget, {
+      initialStack: stack,
+      hands: [hands[0], hands[1]],
+    });
     setHandsSelectTarget(undefined);
   };
+  const [currentStackInputRef, setCurrentStackInputRef] =
+    useState<HTMLInputElement | null>(null);
 
   return (
     <div>
       <div>{`${gameState.activePlayers.length} Players:`}</div>
       <div className="grid grid-cols-3 gap-1 mt-1">
         {gameState.activePlayers.map((v) => (
-          <Button key={v} variant="outline">
-            <span key={v} className="text-sm">
+          <Button
+            key={v}
+            variant="outline"
+            onClick={() => handleHandSelectTarget(v)}
+            className="h-16"
+          >
+            <div key={v} className="text-sm h-16">
               <PositionText
                 key={v}
                 position={v}
-                className={gameState.hands[v] ? undefined : "mr-2"}
+                className={gameState.playersState[v].hands ? undefined : "mr-2"}
               />
-              {gameState.hands[v] && (
-                <span className="text-xs mr-2">{`(${cardText(
-                  gameState.hands[v][0]
-                )} ${cardText(gameState.hands[v][1])})`}</span>
-              )}
-            </span>
+              {
+                <div className="text-xs">
+                  {gameState.playersState[v].hands
+                    ? `${cardText(
+                        gameState.playersState[v].hands[0]
+                      )} ${cardText(gameState.playersState[v].hands[1])}`
+                    : "手札未設定"}
+                </div>
+              }
+              {
+                <div className="text-[0.625rem]">
+                  {gameState.playersState[v].initialStack
+                    ? gameState.playersState[v].initialStack
+                    : "初期スタック未設定"}
+                </div>
+              }
+            </div>
           </Button>
         ))}
       </div>
@@ -127,9 +149,32 @@ export const GameActions = ({
           }}
         >
           <DialogContent>
-            <DialogTitle>手札を選択</DialogTitle>
-            <DialogDescription>手札を選択</DialogDescription>
-            <CardSelect count={2} onSelect={handleHands} />
+            <DialogTitle>手札・初期スタックを設定</DialogTitle>
+            <DialogDescription />
+            <div>
+              <span className="text-sm">初期スタック</span>
+              <div className="flex items-center w-48">
+                {handsSelectTarget && (
+                  <Input
+                    ref={setCurrentStackInputRef}
+                    type="number"
+                    defaultValue={
+                      gameState.playersState[handsSelectTarget].initialStack
+                    }
+                  />
+                )}
+                <div className="ml-2">chips</div>
+              </div>
+            </div>
+            <CardSelect
+              count={2}
+              onSelect={(cards: Card[]) => {
+                const stack = currentStackInputRef?.value
+                  ? Number(currentStackInputRef?.value)
+                  : undefined;
+                handleHands(cards, stack);
+              }}
+            />
           </DialogContent>
         </Dialog>
       </div>

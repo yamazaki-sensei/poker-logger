@@ -9,11 +9,16 @@ import type {
 } from "./types";
 import { atom, useAtom } from "jotai";
 
+type PlayerState = {
+  initialStack: number | undefined;
+  hands: [Card, Card] | undefined;
+};
+
 export interface GameState {
   readonly currentRound: GameRound;
   readonly currentPlayer: Position;
   readonly myPosition: Position;
-  readonly hands: Record<Position, [Card, Card] | undefined>;
+  readonly playersState: Record<Position, PlayerState>;
   readonly gameIndex: number;
   readonly activePlayers: Position[];
   readonly allPlayers: Position[];
@@ -33,16 +38,16 @@ export interface GameState {
 const gameAtom = atom<GameState>({
   currentRound: "preFlop",
   currentPlayer: "UTG",
-  hands: {
-    UTG: undefined,
-    UTG1: undefined,
-    UTG2: undefined,
-    LJ: undefined,
-    HJ: undefined,
-    CO: undefined,
-    BTN: undefined,
-    SB: undefined,
-    BB: undefined,
+  playersState: {
+    UTG: { initialStack: undefined, hands: undefined },
+    UTG1: { initialStack: undefined, hands: undefined },
+    UTG2: { initialStack: undefined, hands: undefined },
+    LJ: { initialStack: undefined, hands: undefined },
+    HJ: { initialStack: undefined, hands: undefined },
+    CO: { initialStack: undefined, hands: undefined },
+    BTN: { initialStack: undefined, hands: undefined },
+    SB: { initialStack: undefined, hands: undefined },
+    BB: { initialStack: undefined, hands: undefined },
   },
   myPosition: "UTG",
   activePlayers: [],
@@ -63,7 +68,7 @@ const gameAtom = atom<GameState>({
 
 export const useGameState = (): {
   readonly gameState: GameState;
-  setHands: (position: Position, cards: [Card, Card]) => void;
+  updatePlayerState: (position: Position, state: PlayerState) => void;
   setMyPosition: (position: Position) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
@@ -71,12 +76,12 @@ export const useGameState = (): {
 } => {
   const [gameState, setGameState] = useAtom(gameAtom);
 
-  const setHands = (position: Position, cards: [Card, Card]) => {
+  const updatePlayerState = (position: Position, state: PlayerState) => {
     setGameState({
       ...gameState,
-      hands: {
-        ...gameState.hands,
-        [position]: cards,
+      playersState: {
+        ...gameState.playersState,
+        [position]: state,
       },
     });
   };
@@ -153,7 +158,7 @@ export const useGameState = (): {
 
   return {
     gameState,
-    setHands,
+    updatePlayerState,
     setMyPosition,
     commitAction,
     setCommunityCards,
@@ -172,16 +177,16 @@ export const useGameStateReset = (): {
       currentPlayer: findFirstPlayer(table.playersCount),
       myPosition: prev.myPosition,
       gameIndex: prev.gameIndex + 1,
-      hands: {
-        UTG: undefined,
-        UTG1: undefined,
-        UTG2: undefined,
-        LJ: undefined,
-        HJ: undefined,
-        CO: undefined,
-        BTN: undefined,
-        SB: undefined,
-        BB: undefined,
+      playersState: {
+        UTG: { initialStack: undefined, hands: undefined },
+        UTG1: { initialStack: undefined, hands: undefined },
+        UTG2: { initialStack: undefined, hands: undefined },
+        LJ: { initialStack: undefined, hands: undefined },
+        HJ: { initialStack: undefined, hands: undefined },
+        CO: { initialStack: undefined, hands: undefined },
+        BTN: { initialStack: undefined, hands: undefined },
+        SB: { initialStack: undefined, hands: undefined },
+        BB: { initialStack: undefined, hands: undefined },
       },
       activePlayers: sortPlayersToPreFlopOrder(
         generateInitialPlayers(table.playersCount)
