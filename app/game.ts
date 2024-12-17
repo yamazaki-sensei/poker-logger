@@ -1,6 +1,5 @@
 "use client";
-import { useCallback } from "react";
-import { useTable } from "./table";
+import { useTable, type TableState } from "./table";
 import type {
   Action,
   ActionWithPlayer,
@@ -14,9 +13,10 @@ export interface GameState {
   readonly currentRound: GameRound;
   readonly currentPlayer: Position;
   readonly myPosition: Position;
+  readonly hands: Record<Position, [Card, Card] | undefined>;
   readonly gameIndex: number;
-  readonly myCards: [Card, Card] | undefined;
   readonly activePlayers: Position[];
+  readonly allPlayers: Position[];
   readonly actions: {
     readonly preFlop: { player: Position; action: Action }[];
     readonly flop: { player: Position; action: Action }[];
@@ -33,9 +33,20 @@ export interface GameState {
 const gameAtom = atom<GameState>({
   currentRound: "preFlop",
   currentPlayer: "UTG",
+  hands: {
+    UTG: undefined,
+    UTG1: undefined,
+    UTG2: undefined,
+    LJ: undefined,
+    HJ: undefined,
+    CO: undefined,
+    BTN: undefined,
+    SB: undefined,
+    BB: undefined,
+  },
   myPosition: "UTG",
-  myCards: undefined,
   activePlayers: [],
+  allPlayers: [],
   gameIndex: 0,
   actions: {
     preFlop: [],
@@ -52,98 +63,63 @@ const gameAtom = atom<GameState>({
 
 export const useGameState = (): {
   readonly gameState: GameState;
-  setMyCards: (cards: [Card, Card]) => void;
+  setHands: (position: Position, cards: [Card, Card]) => void;
   setMyPosition: (position: Position) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
   setCommunityCards: (round: GameRound, cards: Card[]) => void;
-  resetGameState: () => void;
 } => {
   const [gameState, setGameState] = useAtom(gameAtom);
-  const { tableState } = useTable();
 
-  const setMyCards = useCallback(
-    (cards: [Card, Card]) => {
-      setGameState({
-        ...gameState,
-        myCards: cards,
-      });
-    },
-    [gameState, setGameState]
-  );
+  const setHands = (position: Position, cards: [Card, Card]) => {
+    setGameState({
+      ...gameState,
+      hands: {
+        ...gameState.hands,
+        [position]: cards,
+      },
+    });
+  };
 
-  const setMyPosition = useCallback(
-    (position: Position) => {
-      setGameState({
-        ...gameState,
-        myPosition: position,
-      });
-    },
-    [gameState, setGameState]
-  );
+  const setMyPosition = (position: Position) => {
+    setGameState({
+      ...gameState,
+      myPosition: position,
+    });
+  };
 
-  const resetGameState = useCallback(() => {
-    setGameState((prev) => ({
-      currentRound: "preFlop",
-      currentPlayer: findFirstPlayer(tableState.playersCount),
-      myPosition: prev.myPosition,
-      gameIndex: prev.gameIndex + 1,
-      myCards: undefined,
-      activePlayers: sortPlayersToPreFlopOrder(
-        generateInitialPlayers(tableState.playersCount)
-      ),
+  const commitAction = (round: GameRound, action: ActionWithPlayer) => {
+    const nextPlayers =
+      action.action.type === "fold"
+        ? gameState.activePlayers.filter((v) => v !== action.player)
+        : gameState.activePlayers;
+
+    setGameState({
+      ...gameState,
       actions: {
-        preFlop: [],
-        flop: [],
-        turn: [],
-        river: [],
+        ...gameState.actions,
+        [round]: [...gameState.actions[round], action],
       },
+      activePlayers: nextPlayers,
+      currentPlayer: findNextPlayer({
+        round: gameState.currentRound,
+        currentPlayer: gameState.currentPlayer,
+        activePlayers: gameState.activePlayers,
+      }),
+    });
+  };
+
+  const setCommunityCards = (round: GameRound, cards: Card[]) => {
+    setGameState({
+      ...gameState,
       communityCards: {
-        flop: undefined,
-        turn: undefined,
-        river: undefined,
+        ...gameState.communityCards,
+        [round]: cards,
       },
-    }));
-  }, [tableState.playersCount, setGameState]);
+    });
+  };
 
-  const commitAction = useCallback(
-    (round: GameRound, action: ActionWithPlayer) => {
-      const nextPlayers =
-        action.action.type === "fold"
-          ? gameState.activePlayers.filter((v) => v !== action.player)
-          : gameState.activePlayers;
-
-      setGameState({
-        ...gameState,
-        actions: {
-          ...gameState.actions,
-          [round]: [...gameState.actions[round], action],
-        },
-        activePlayers: nextPlayers,
-        currentPlayer: findNextPlayer({
-          round: gameState.currentRound,
-          currentPlayer: gameState.currentPlayer,
-          activePlayers: gameState.activePlayers,
-        }),
-      });
-    },
-    [gameState, gameState.actions, setGameState]
-  );
-
-  const setCommunityCards = useCallback(
-    (round: GameRound, cards: Card[]) => {
-      setGameState({
-        ...gameState,
-        communityCards: {
-          ...gameState.communityCards,
-          [round]: cards,
-        },
-      });
-    },
-    [gameState, gameState.communityCards, setGameState]
-  );
-
-  const toNextRound = useCallback(() => {
+  const toNextRound = () => {
     const activePlayers = sortPlayersToGeneralOrder(gameState.activePlayers);
     switch (gameState.currentRound) {
       case "preFlop":
@@ -173,16 +149,60 @@ export const useGameState = (): {
       default:
         throw new Error("Invalid round");
     }
-  }, [gameState, setGameState]);
+  };
 
   return {
     gameState,
-    setMyCards,
+    setHands,
     setMyPosition,
     commitAction,
     setCommunityCards,
     toNextRound,
-    resetGameState,
+  };
+};
+
+export const useGameStateReset = (): {
+  resetGame: (table: TableState) => void;
+} => {
+  const setGameState = useAtom(gameAtom)[1];
+
+  const resetGame = (table: TableState) => {
+    setGameState((prev) => ({
+      currentRound: "preFlop",
+      currentPlayer: findFirstPlayer(table.playersCount),
+      myPosition: prev.myPosition,
+      gameIndex: prev.gameIndex + 1,
+      hands: {
+        UTG: undefined,
+        UTG1: undefined,
+        UTG2: undefined,
+        LJ: undefined,
+        HJ: undefined,
+        CO: undefined,
+        BTN: undefined,
+        SB: undefined,
+        BB: undefined,
+      },
+      activePlayers: sortPlayersToPreFlopOrder(
+        generateInitialPlayers(table.playersCount)
+      ),
+      allPlayers: generateInitialPlayers(table.playersCount),
+      actions: {
+        preFlop: [],
+        flop: [],
+        turn: [],
+        river: [],
+      },
+      communityCards: {
+        flop: undefined,
+        turn: undefined,
+        river: undefined,
+      },
+    }));
+  };
+
+  return {
+    resetGame,
   };
 };
 

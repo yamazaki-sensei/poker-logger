@@ -2,6 +2,7 @@ import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 import { useMemo } from "react";
 import type { Position } from "./types";
+import { useGameState, useGameStateReset } from "./game";
 
 export interface TableState {
   readonly sb: number;
@@ -20,20 +21,26 @@ const initialTableState: TableState = {
 const tableAtom = atomWithStorage("TableState", initialTableState);
 
 export const useTable = (): {
-  tableState: TableState;
-  updateTableState: (state: TableState) => void;
+  table: TableState;
+  updateTable: (state: TableState) => void;
 } => {
   const [tableState, updateTableState] = useAtom(tableAtom);
+  const { resetGame } = useGameStateReset();
+
+  const updateTable = (state: TableState) => {
+    updateTableState(state);
+    resetGame(state);
+  };
 
   return {
-    tableState,
-    updateTableState,
+    table: tableState,
+    updateTable,
   };
 };
 
 export const usePositions = (): Position[] => {
-  const { tableState } = useTable();
-  const playersCount = tableState.playersCount;
+  const { table } = useTable();
+  const playersCount = table.playersCount;
 
   return useMemo(() => {
     switch (playersCount) {
@@ -42,13 +49,13 @@ export const usePositions = (): Position[] => {
       case 3:
         return ["SB", "BB", "BTN"];
       case 4:
-        return ["SB", "BB", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "BTN"];
       case 5:
-        return ["SB", "BB", "HJ", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "CO", "BTN"];
       case 6:
-        return ["SB", "BB", "LJ", "HJ", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "HJ", "CO", "BTN"];
       case 7:
-        return ["SB", "BB", "UTG", "LJ", "HJ", "CO", "BTN"];
+        return ["SB", "BB", "UTG", "UTG1", "HJ", "CO", "BTN"];
       case 8:
         return ["SB", "BB", "UTG", "UTG1", "LJ", "HJ", "CO", "BTN"];
       case 9:

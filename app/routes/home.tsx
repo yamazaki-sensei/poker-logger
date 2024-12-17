@@ -1,7 +1,7 @@
 import { use, useEffect, useState, type ReactNode } from "react";
 import * as Tabs from "@radix-ui/react-tabs";
 import { GameActions } from "~/components/GameActions";
-import { useGameState } from "~/game";
+import { useGameState, useGameStateReset } from "~/game";
 import type { Card, GameRound } from "~/types";
 import {
   Dialog,
@@ -14,6 +14,7 @@ import { cardText } from "~/utils/card_util";
 import { CardSelect } from "~/components/CardSelect";
 import { gameRoundText } from "~/utils/round_util";
 import { TableSettingsFrame } from "~/TableSettingsFrame";
+import { useTable } from "~/table";
 
 export function meta() {
   return [
@@ -77,8 +78,12 @@ const RoundTitle = ({ round }: { round: GameRound }) => {
 };
 
 export default function Home() {
-  const { gameState, resetGameState } = useGameState();
-  useEffect(resetGameState, []);
+  const { gameState } = useGameState();
+  const { resetGame } = useGameStateReset();
+  const { table } = useTable();
+  useEffect(() => {
+    resetGame(table);
+  }, []);
   const [tab, setTab] = useState("preFlop");
 
   useEffect(() => {

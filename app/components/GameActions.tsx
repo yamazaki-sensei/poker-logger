@@ -1,20 +1,31 @@
-import { useCallback } from "react";
+import { useState } from "react";
 import { useGameState } from "~/game";
-import type { GameRound, Action } from "~/types";
+import type { GameRound, Action, Position, Card } from "~/types";
 import { PlayerAction } from "./Action";
 import { actionToText } from "~/utils/action_util";
 import { Button } from "./ui/button";
 import { gameRoundText } from "~/utils/round_util";
 import { PositionText } from "./PositionText";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "./ui/dialog";
+import { CardSelect } from "./CardSelect";
+import { cardText } from "~/utils/card_util";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
-  const onAction = useCallback(
-    (action: Action) => {
-      commitAction(round, { player: gameState.currentPlayer, action });
-    },
-    [gameState.currentPlayer, round, commitAction]
-  );
+  const onAction = (action: Action) => {
+    commitAction(round, { player: gameState.currentPlayer, action });
+  };
 
   if (gameState.activePlayers.length === 0) {
     return <div>全員foldしました</div>;
@@ -40,17 +51,58 @@ export const GameActions = ({
   round: GameRound;
   onNextRound?: () => void;
 }) => {
-  const { gameState, toNextRound } = useGameState();
+  const { gameState, toNextRound, setHands } = useGameState();
   const actions = gameState.actions[round];
+  const [handsSelectTarget, setHandsSelectTarget] = useState<Position>();
+  const handleHandSelectTarget = (position: Position) => {
+    setHandsSelectTarget(position);
+  };
+  const handleHands = (hands: Card[]) => {
+    if (!handsSelectTarget) {
+      return;
+    }
+    setHands(handsSelectTarget, [hands[0], hands[1]]);
+    setHandsSelectTarget(undefined);
+  };
 
   return (
     <div>
-      <div>{`Active ${gameState.activePlayers.length}:`}</div>
+      <div>{`${gameState.activePlayers.length} Players:`}</div>
       <div>
         {gameState.activePlayers.map((v) => (
-          <PositionText key={v} position={v} className="mr-2" />
+          <span key={v} className="text-sm">
+            <PositionText
+              key={v}
+              position={v}
+              className={gameState.hands[v] ? undefined : "mr-2"}
+            />
+            {gameState.hands[v] && (
+              <span className="text-xs mr-2">{`(${cardText(
+                gameState.hands[v][0]
+              )} ${cardText(gameState.hands[v][1])})`}</span>
+            )}
+          </span>
         ))}
       </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" className="w-full mt-4">
+            手札を登録する
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          {gameState.allPlayers.map((v) => (
+            <DropdownMenuItem
+              textValue={v}
+              key={v}
+              onSelect={() => handleHandSelectTarget(v)}
+              className="cursor-pointer"
+            >
+              <PositionText position={v} className="text-sm" />
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
       <div className="mt-3">
         {actions.map(({ player, action }, i) => (
           <div
@@ -82,6 +134,22 @@ export const GameActions = ({
           </Button>
         </div>
       )}
+      <div>
+        <Dialog
+          open={handsSelectTarget !== undefined}
+          onOpenChange={(open) => {
+            if (!open) {
+              setHandsSelectTarget(undefined);
+            }
+          }}
+        >
+          <DialogContent>
+            <DialogTitle>手札を選択</DialogTitle>
+            <DialogDescription>手札を選択</DialogDescription>
+            <CardSelect count={2} onSelect={handleHands} />
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 };

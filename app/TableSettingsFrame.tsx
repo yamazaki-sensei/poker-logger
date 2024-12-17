@@ -1,13 +1,5 @@
-import { useCallback, useState, type ChangeEvent, type ReactNode } from "react";
+import { type ChangeEvent, type ReactNode } from "react";
 import { useTable, usePositions } from "./table";
-import { cardText } from "./utils/card_util";
-import { CardSelect } from "./components/CardSelect";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "./components/ui/dialog";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import {
@@ -17,72 +9,46 @@ import {
   SelectContent,
 } from "./components/ui/select";
 import type { Card, Position } from "./types";
-import { useGameState } from "./game";
+import { useGameState, useGameStateReset } from "./game";
 import { Separator } from "./components/ui/separator";
 import { loadResults, useResultsWriter } from "./results";
 
 const Footer = () => {
-  const { tableState, updateTableState } = useTable();
-  const { gameState, setMyCards, setMyPosition, resetGameState } =
-    useGameState();
+  const { table, updateTable } = useTable();
+  const { gameState, setMyPosition } = useGameState();
 
   const positions = usePositions();
-  const onPlayersCountChange = useCallback(
-    (v: string) => {
-      updateTableState({
-        ...tableState,
-        playersCount: Number.parseInt(v),
-      });
-    },
-    [tableState, updateTableState, resetGameState]
-  );
+  const onPlayersCountChange = (v: string) => {
+    updateTable({
+      ...table,
+      playersCount: Number.parseInt(v),
+    });
+  };
 
-  const onPositionChange = useCallback(
-    (v: string) => {
-      setMyPosition(v as Position);
-    },
-    [setMyPosition]
-  );
+  const onPositionChange = (v: string) => {
+    setMyPosition(v as Position);
+  };
 
-  const onSbChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      updateTableState({
-        ...tableState,
-        sb: Number.parseInt(event.currentTarget.value || "0"),
-      });
-    },
-    [tableState, updateTableState]
-  );
+  const onSbChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateTable({
+      ...table,
+      sb: Number.parseInt(event.currentTarget.value || "0"),
+    });
+  };
 
-  const onBbChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      updateTableState({
-        ...tableState,
-        bb: Number.parseInt(event.currentTarget.value || "0"),
-      });
-    },
-    [tableState, updateTableState]
-  );
+  const onBbChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateTable({
+      ...table,
+      bb: Number.parseInt(event.currentTarget.value || "0"),
+    });
+  };
 
-  const onAntiChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      updateTableState({
-        ...tableState,
-        anti: Number.parseInt(event.currentTarget.value || "0"),
-      });
-    },
-    [tableState, updateTableState]
-  );
-
-  const onCardsChange = useCallback(
-    (cards: Card[]) => {
-      setCardSelectDialogOpened(false);
-      setMyCards(cards as [Card, Card]);
-    },
-    [setMyCards]
-  );
-
-  const [cardSelectDialogOpened, setCardSelectDialogOpened] = useState(false);
+  const onAntiChange = (event: ChangeEvent<HTMLInputElement>) => {
+    updateTable({
+      ...table,
+      anti: Number.parseInt(event.currentTarget.value || "0"),
+    });
+  };
 
   return (
     <div>
@@ -91,15 +57,12 @@ const Footer = () => {
           <div className="text-sm">人数:</div>
           <div className="ml-2">
             <Select
-              value={`${tableState.playersCount}`}
-              onValueChange={(v) => {
-                onPlayersCountChange(v);
-                resetGameState();
-              }}
+              value={`${table.playersCount}`}
+              onValueChange={onPlayersCountChange}
             >
               <SelectTrigger>
                 <div className="flex items-center">
-                  <span className="ml-1">{tableState.playersCount}人</span>
+                  <span className="ml-1">{table.playersCount}人</span>
                 </div>
               </SelectTrigger>
               <SelectContent position="popper">
@@ -132,29 +95,6 @@ const Footer = () => {
             </Select>
           </div>
         </div>
-        <div className="flex items-center flex-1 justify-end">
-          手札:
-          <div>
-            <Dialog
-              open={cardSelectDialogOpened}
-              onOpenChange={setCardSelectDialogOpened}
-            >
-              <Button
-                variant="ghost"
-                onClick={() => setCardSelectDialogOpened(true)}
-              >
-                {gameState.myCards
-                  ? gameState.myCards.map((v) => cardText(v)).join(" ")
-                  : "未選択"}
-              </Button>
-              <DialogContent>
-                <DialogTitle>手札を選択</DialogTitle>
-                <DialogDescription>手札を選択</DialogDescription>
-                <CardSelect count={2} onSelect={onCardsChange} />
-              </DialogContent>
-            </Dialog>
-          </div>
-        </div>
       </div>
       <div className="grid grid-cols-3 mt-2">
         <div className="flex items-center pr-2">
@@ -163,7 +103,7 @@ const Footer = () => {
             <Input
               min={0}
               type="number"
-              value={`${tableState.sb}`.replace(/^0+/, "") || "0"}
+              value={`${table.sb}`.replace(/^0+/, "") || "0"}
               onChange={onSbChange}
             />
           </div>
@@ -173,7 +113,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${tableState.bb}`.replace(/^0+/, "") || "0"}
+              value={`${table.bb}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onBbChange}
             />
@@ -184,7 +124,7 @@ const Footer = () => {
           <div className="ml-2">
             <Input
               min={0}
-              value={`${tableState.anti}`.replace(/^0+/, "") || "0"}
+              value={`${table.anti}`.replace(/^0+/, "") || "0"}
               type="number"
               onChange={onAntiChange}
             />
@@ -196,15 +136,22 @@ const Footer = () => {
 };
 
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
-  const { resetGameState } = useGameState();
+  const { resetGame } = useGameStateReset();
   const { storeCurrentBoard } = useResultsWriter();
+  const { table } = useTable();
 
   return (
     <div className="relative w-full h-full pb-[200px]">
       {children}
 
       <div className="flex justify-end flex-1 p-4">
-        <Button onClick={resetGameState}>リセット</Button>
+        <Button
+          onClick={() => {
+            resetGame(table);
+          }}
+        >
+          リセット
+        </Button>
       </div>
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">

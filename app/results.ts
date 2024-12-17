@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { useGameState, type GameState } from "./game";
 import { useTable, type TableState } from "./table";
 
@@ -6,7 +5,11 @@ const storeKey = "results";
 
 type GameResult = Omit<
   GameState,
-  "currentRound" | "currentPlayer" | "activePlayers" | "gameIndex"
+  | "currentRound"
+  | "currentPlayer"
+  | "activePlayers"
+  | "allPlayers"
+  | "gameIndex"
 >;
 
 export type BoardResult = {
@@ -32,16 +35,16 @@ export const useResultsWriter = (): {
   storeCurrentBoard: () => void;
 } => {
   const { gameState } = useGameState();
-  const { tableState } = useTable();
+  const { table } = useTable();
 
-  const storeCurrentBoard = useCallback(() => {
+  const storeCurrentBoard = () => {
     const current = localStorage.getItem(storeKey);
     const timestamp = new Date().toISOString();
     const gameResult: GameResult = {
-      myCards: gameState.myCards,
       myPosition: gameState.myPosition,
       actions: gameState.actions,
       communityCards: gameState.communityCards,
+      hands: gameState.hands,
     };
     const next = [
       ...JSON.parse(current || "[]"),
@@ -49,13 +52,13 @@ export const useResultsWriter = (): {
         date: timestamp,
         payload: {
           game: gameResult,
-          table: tableState,
+          table: table,
         },
       },
     ];
 
     localStorage.setItem(storeKey, JSON.stringify(next));
-  }, [gameState, tableState]);
+  };
 
   return {
     storeCurrentBoard,
