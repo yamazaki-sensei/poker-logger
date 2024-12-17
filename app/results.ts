@@ -33,6 +33,7 @@ export const loadResults = async (): Promise<
 
 export const useResultsWriter = (): {
   storeCurrentBoard: () => void;
+  removeBoard: (index: number) => void;
 } => {
   const { gameState } = useGameState();
   const { table } = useTable();
@@ -61,7 +62,18 @@ export const useResultsWriter = (): {
     localStorage.setItem(storeKey, JSON.stringify(next));
   };
 
+  const removeBoard = (index: number) => {
+    const results = JSON.parse(localStorage.getItem(storeKey) ?? "[]") as {
+      date: string;
+      payload: BoardResult;
+    }[];
+
+    const next = results.filter((_, i) => i !== index);
+    localStorage.setItem(storeKey, JSON.stringify(next));
+  };
+
   return {
     storeCurrentBoard,
+    removeBoard,
   };
 };

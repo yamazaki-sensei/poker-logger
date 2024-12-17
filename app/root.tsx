@@ -10,6 +10,7 @@ import { Theme } from "@radix-ui/themes";
 
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { Toaster } from "./components/ui/toaster";
 
 export const links: Route.LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
@@ -31,6 +32,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Theme>
           <div className="h-full">
             {children}
+            <Toaster />
             <ScrollRestoration />
           </div>
         </Theme>
