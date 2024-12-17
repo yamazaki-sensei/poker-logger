@@ -33,6 +33,7 @@ export interface GameState {
     turn: [Card] | undefined;
     river: [Card] | undefined;
   };
+  readonly memo: string;
 }
 
 const gameAtom = atom<GameState>({
@@ -64,6 +65,7 @@ const gameAtom = atom<GameState>({
     turn: undefined,
     river: undefined,
   },
+  memo: "",
 });
 
 export const useGameState = (): {
@@ -73,6 +75,7 @@ export const useGameState = (): {
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   toNextRound: () => void;
   setCommunityCards: (round: GameRound, cards: Card[]) => void;
+  setMemo: (memo: string) => void;
 } => {
   const [gameState, setGameState] = useAtom(gameAtom);
 
@@ -156,6 +159,10 @@ export const useGameState = (): {
     }
   };
 
+  const setMemo = (memo: string) => {
+    setGameState({ ...gameState, memo });
+  };
+
   return {
     gameState,
     updatePlayerState,
@@ -163,6 +170,7 @@ export const useGameState = (): {
     commitAction,
     setCommunityCards,
     toNextRound,
+    setMemo,
   };
 };
 
@@ -203,6 +211,7 @@ export const useGameStateReset = (): {
         turn: undefined,
         river: undefined,
       },
+      memo: "",
     }));
   };
 

@@ -45,6 +45,7 @@ export const useResultsWriter = (): {
       actions: gameState.actions,
       communityCards: gameState.communityCards,
       playersState: gameState.playersState,
+      memo: gameState.memo,
     };
     const next = [
       ...JSON.parse(current || "[]"),

@@ -138,6 +138,7 @@ const Footer = () => {
 
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   const { resetGame } = useGameStateReset();
+  const { gameState, setMemo } = useGameState();
   const { storeCurrentBoard } = useResultsWriter();
   const { table } = useTable();
 
@@ -146,6 +147,13 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
       {children}
 
       <div className="flex justify-end flex-1 p-4">
+        <Input
+          placeholder="簡単なメモ(30文字以内)"
+          className="mr-2"
+          value={gameState.memo}
+          maxLength={30}
+          onChange={(event) => setMemo(event.currentTarget.value)}
+        />
         <Button
           onClick={() => {
             resetGame(table);
