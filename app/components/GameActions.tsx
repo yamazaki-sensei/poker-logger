@@ -68,41 +68,24 @@ export const GameActions = ({
   return (
     <div>
       <div>{`${gameState.activePlayers.length} Players:`}</div>
-      <div>
+      <div className="grid grid-cols-3 gap-1 mt-1">
         {gameState.activePlayers.map((v) => (
-          <span key={v} className="text-sm">
-            <PositionText
-              key={v}
-              position={v}
-              className={gameState.hands[v] ? undefined : "mr-2"}
-            />
-            {gameState.hands[v] && (
-              <span className="text-xs mr-2">{`(${cardText(
-                gameState.hands[v][0]
-              )} ${cardText(gameState.hands[v][1])})`}</span>
-            )}
-          </span>
+          <Button key={v} variant="outline">
+            <span key={v} className="text-sm">
+              <PositionText
+                key={v}
+                position={v}
+                className={gameState.hands[v] ? undefined : "mr-2"}
+              />
+              {gameState.hands[v] && (
+                <span className="text-xs mr-2">{`(${cardText(
+                  gameState.hands[v][0]
+                )} ${cardText(gameState.hands[v][1])})`}</span>
+              )}
+            </span>
+          </Button>
         ))}
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" className="w-full mt-4">
-            手札を登録する
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          {gameState.allPlayers.map((v) => (
-            <DropdownMenuItem
-              textValue={v}
-              key={v}
-              onSelect={() => handleHandSelectTarget(v)}
-              className="cursor-pointer"
-            >
-              <PositionText position={v} className="text-sm" />
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
       <div className="mt-3">
         {actions.map(({ player, action }, i) => (
           <div

@@ -38,8 +38,7 @@ export const PlayerAction = ({
             value={`${raiseAmount}`.replace(/^0+/, "") || "0"}
             type="number"
             min={0}
-            size={1}
-            className="w-16"
+            className="w-24"
             onChange={(event) => {
               setRaiseAmount(Number.parseInt(event.currentTarget.value || "0"));
             }}
