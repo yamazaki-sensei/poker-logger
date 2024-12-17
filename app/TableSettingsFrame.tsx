@@ -1,4 +1,4 @@
-import { type ChangeEvent, type ReactNode } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 import { useTable, usePositions } from "./table";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -12,6 +12,7 @@ import type { Card, Position } from "./types";
 import { useGameState, useGameStateReset } from "./game";
 import { Separator } from "./components/ui/separator";
 import { loadResults, useResultsWriter } from "./results";
+import { Link } from "react-router";
 
 const Footer = () => {
   const { table, updateTable } = useTable();
@@ -156,15 +157,11 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">
           <Button onClick={storeCurrentBoard}>現在のボードを保存</Button>
-          <Button
-            onClick={() => {
-              const results = loadResults();
-              console.log(results);
-            }}
-            className="ml-2"
-          >
-            保存したボードを確認
-          </Button>
+          <div className="flex items-center ml-4">
+            <Link to="/results" className="text-sm underline">
+              保存したボードを確認
+            </Link>
+          </div>
         </div>
         <Separator />
         <div className="p-2">
