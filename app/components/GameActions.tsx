@@ -7,12 +7,6 @@ import { Button } from "./ui/button";
 import { gameRoundText } from "~/utils/round_util";
 import { PositionText } from "./PositionText";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -36,11 +30,8 @@ const ActionArea = ({ round }: { round: GameRound }) => {
   }
 
   return (
-    <div className="grid grid-cols-12 items-center">
-      <div className="col-span-1">{gameState.currentPlayer}</div>
-      <div className="col-span-11 px-2">
-        <PlayerAction onAction={onAction} />
-      </div>
+    <div className="">
+      <PlayerAction onAction={onAction} />
     </div>
   );
 };
@@ -71,18 +62,25 @@ export const GameActions = ({
   const [currentStackInputRef, setCurrentStackInputRef] =
     useState<HTMLInputElement | null>(null);
 
+  const isFolded = (player: Position) =>
+    !gameState.activePlayers.includes(player);
+
+  const isCurrent = (player: Position) => gameState.currentPlayer === player;
+
   return (
     <div>
       <div>{`${gameState.activePlayers.length} Players:`}</div>
       <div className="grid grid-cols-3 gap-1 mt-1">
-        {gameState.activePlayers.map((v) => (
+        {gameState.allPlayers.map((v) => (
           <Button
             key={v}
             variant="outline"
             onClick={() => handleHandSelectTarget(v)}
-            className="h-16"
+            className={`h-16 ${isFolded(v) ? "opacity-50" : ""} ${
+              isCurrent(v) ? "bg-cyan-100" : ""
+            }`}
           >
-            <div key={v} className="text-sm h-16">
+            <div key={v} className="text-sm h-16 flex justify-center flex-col">
               <PositionText
                 key={v}
                 position={v}
@@ -108,6 +106,9 @@ export const GameActions = ({
           </Button>
         ))}
       </div>
+      <div className="mt-4">
+        <ActionArea round={round} />
+      </div>
       <div className="mt-3">
         {actions.map(({ player, action }, i) => (
           <div
@@ -117,14 +118,9 @@ export const GameActions = ({
             <div className="col-span-4">
               {actionToText({ position: player, action })}
             </div>
-
-            <Button variant="destructive" size="icon">
-              削除
-            </Button>
           </div>
         ))}
       </div>
-      <ActionArea round={round} />
       {gameState.currentRound === round && (
         <div className="mt-12">
           <Button
