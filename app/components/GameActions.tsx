@@ -92,14 +92,14 @@ export const GameActions = ({
                     ? `${cardText(
                         gameState.playersState[v].hands[0]
                       )} ${cardText(gameState.playersState[v].hands[1])}`
-                    : "手札未設定"}
+                    : "手札: ?"}
                 </div>
               }
               {
                 <div className="text-[0.625rem]">
                   {gameState.playersState[v].initialStack
                     ? gameState.playersState[v].initialStack
-                    : "初期スタック未設定"}
+                    : "初期スタック: ?"}
                 </div>
               }
             </div>
