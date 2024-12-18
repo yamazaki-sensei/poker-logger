@@ -22,6 +22,8 @@ export interface GameState {
   readonly gameIndex: number;
   readonly activePlayers: Position[];
   readonly allPlayers: Position[];
+  readonly betSize: number;
+  readonly potSize: number;
   readonly actions: {
     readonly preFlop: { player: Position; action: Action }[];
     readonly flop: { player: Position; action: Action }[];
@@ -53,6 +55,8 @@ const gameAtom = atom<GameState>({
   myPosition: "UTG",
   activePlayers: [],
   allPlayers: [],
+  betSize: 0,
+  potSize: 0,
   gameIndex: 0,
   actions: {
     preFlop: [],
@@ -196,6 +200,8 @@ export const useGameStateReset = (): {
         SB: { initialStack: undefined, hands: undefined },
         BB: { initialStack: undefined, hands: undefined },
       },
+      betSize: table.bb,
+      potSize: table.bb + table.sb + table.anti,
       activePlayers: sortPlayersToPreFlopOrder(
         generateInitialPlayers(table.playersCount)
       ),
