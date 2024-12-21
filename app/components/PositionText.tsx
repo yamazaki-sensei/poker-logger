@@ -12,5 +12,10 @@ export const PositionText = ({
 
   const textStyle =
     gameState.myPosition === position ? "text-red-500" : undefined;
-  return <span className={`${textStyle} ${className}`}>{position}</span>;
+  return (
+    <span>
+      <span className={`${textStyle} ${className}`}>{position}</span>
+      <span className="text-xs">{gameState.currentBetSizes[position]}</span>
+    </span>
+  );
 };

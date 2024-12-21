@@ -8,10 +8,8 @@ export const actionToText = ({
   action: Action;
 }): string => {
   switch (action.type) {
-    case "call":
-      return `${position} が call`;
-    case "check":
-      return `${position} が check`;
+    case "checkOrCall":
+      return `${position} が check / call`;
     case "raise":
       return `${position} が ${action.amount} に raise`;
     case "fold":

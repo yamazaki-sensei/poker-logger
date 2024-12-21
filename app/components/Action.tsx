@@ -12,22 +12,15 @@ export const PlayerAction = ({
 
   return (
     <div className="grid grid-cols-3 gap-2">
-      <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "check" })} className="w-full">
-          Check
+      <div className="flex items-center col-span-1">
+        <Button
+          onClick={() => onAction({ type: "checkOrCall" })}
+          className="w-full"
+        >
+          Check / Call
         </Button>
       </div>
-      <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "call" })} className="w-full">
-          Call
-        </Button>
-      </div>
-      <div className="flex items-center">
-        <Button onClick={() => onAction({ type: "fold" })} className="w-full">
-          Fold
-        </Button>
-      </div>
-      <div className="flex items-center">
+      <div className="flex items-center col-span-2">
         <Button
           onClick={() => onAction({ type: "raise", amount: raiseAmount })}
         >
@@ -45,6 +38,11 @@ export const PlayerAction = ({
           />
           <div className="text-xs ml-2">chips</div>
         </div>
+      </div>
+      <div className="flex items-center col-span-3">
+        <Button onClick={() => onAction({ type: "fold" })} className="w-full">
+          Fold
+        </Button>
       </div>
     </div>
   );

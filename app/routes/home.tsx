@@ -104,7 +104,7 @@ export default function Home() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   useEffect(() => {
     resetGame(table);
-  }, []);
+  }, [table]);
 
   const [tab, setTab] = useState("preFlop");
 

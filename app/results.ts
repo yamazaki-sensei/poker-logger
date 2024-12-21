@@ -7,6 +7,8 @@ type GameResult = Omit<
   GameState,
   | "currentRound"
   | "currentPlayer"
+  | "currentBetSizes"
+  | "betSize"
   | "activePlayers"
   | "allPlayers"
   | "gameIndex"
@@ -47,6 +49,7 @@ export const useResultsWriter = (): {
       communityCards: gameState.communityCards,
       playersState: gameState.playersState,
       memo: gameState.memo,
+      potSize: gameState.potSize,
     };
     const next = [
       ...JSON.parse(current || "[]"),

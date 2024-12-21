@@ -89,10 +89,13 @@ export default function Results() {
         <div className="p-4" key={index}>
           <DataLoader
             consumer={(results) => (
-              <DataTable
-                results={results}
-                onDelete={() => setIndex(index + 1)}
-              />
+              <>
+                <DataTable
+                  results={results}
+                  onDelete={() => setIndex(index + 1)}
+                />
+                <div>{resultToHandHistory(results[0].payload)}</div>
+              </>
             )}
           />
         </div>

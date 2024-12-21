@@ -39,15 +39,11 @@ export type GameRound = "preFlop" | "flop" | "turn" | "river";
 export type ActionType = "check" | "fold" | "call" | "raise";
 export type Action =
   | {
-      type: "check";
+      type: "checkOrCall";
       amount?: undefined;
     }
   | {
       type: "fold";
-      amount?: undefined;
-    }
-  | {
-      type: "call";
       amount?: undefined;
     }
   | {

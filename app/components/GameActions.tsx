@@ -115,7 +115,7 @@ export const GameActions = ({
             key={`${player}-${JSON.stringify(action)}-${i}`}
             className="items-center p-2 grid grid-cols-12"
           >
-            <div className="col-span-4">
+            <div className="col-span-12">
               {actionToText({ position: player, action })}
             </div>
           </div>

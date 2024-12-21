@@ -77,7 +77,7 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex items-center ml-2">
-          <div className="text-sm">ポジション:</div>
+          <div className="text-sm">Hero:</div>
           <div className="ml-2">
             <Select
               value={`${gameState.myPosition}`}

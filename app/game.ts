@@ -1,4 +1,5 @@
 "use client";
+import { c } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
 import { useTable, type TableState } from "./table";
 import type {
   Action,
@@ -8,6 +9,7 @@ import type {
   Position,
 } from "./types";
 import { atom, useAtom } from "jotai";
+import { act } from "react";
 
 type PlayerState = {
   initialStack: number | undefined;
@@ -19,6 +21,7 @@ export interface GameState {
   readonly currentPlayer: Position;
   readonly myPosition: Position;
   readonly playersState: Record<Position, PlayerState>;
+  readonly currentBetSizes: Record<Position, number>;
   readonly gameIndex: number;
   readonly activePlayers: Position[];
   readonly allPlayers: Position[];
@@ -51,6 +54,17 @@ const gameAtom = atom<GameState>({
     BTN: { initialStack: undefined, hands: undefined },
     SB: { initialStack: undefined, hands: undefined },
     BB: { initialStack: undefined, hands: undefined },
+  },
+  currentBetSizes: {
+    UTG: 0,
+    UTG1: 0,
+    UTG2: 0,
+    LJ: 0,
+    HJ: 0,
+    CO: 0,
+    BTN: 0,
+    SB: 0,
+    BB: 0,
   },
   myPosition: "UTG",
   activePlayers: [],
@@ -106,13 +120,35 @@ export const useGameState = (): {
         ? gameState.activePlayers.filter((v) => v !== action.player)
         : gameState.activePlayers;
 
+    let nextBetSize = gameState.betSize;
+    let nextPotSize = gameState.potSize;
+    let playersBetSize = gameState.currentBetSizes[action.player];
+
+    if (action.action.type === "raise") {
+      nextPotSize += action.action.amount - playersBetSize;
+      nextBetSize = action.action.amount;
+      playersBetSize = action.action.amount;
+    } else if (action.action.type === "checkOrCall") {
+      nextPotSize += gameState.betSize - playersBetSize;
+      playersBetSize = gameState.betSize;
+    }
+
     setGameState({
       ...gameState,
+      betSize: nextBetSize,
+      potSize: nextPotSize,
       actions: {
         ...gameState.actions,
         [round]: [...gameState.actions[round], action],
       },
       activePlayers: nextPlayers,
+      playersState: {
+        ...gameState.playersState,
+      },
+      currentBetSizes: {
+        ...gameState.currentBetSizes,
+        [action.player]: playersBetSize,
+      },
       currentPlayer: findNextPlayer({
         round: gameState.currentRound,
         currentPlayer: gameState.currentPlayer,
@@ -137,6 +173,7 @@ export const useGameState = (): {
       case "preFlop":
         setGameState({
           ...gameState,
+          betSize: 0,
           currentRound: "flop",
           activePlayers,
           currentPlayer: activePlayers[0],
@@ -145,6 +182,7 @@ export const useGameState = (): {
       case "flop":
         setGameState({
           ...gameState,
+          betSize: 0,
           currentRound: "turn",
           activePlayers,
           currentPlayer: activePlayers[0],
@@ -153,6 +191,7 @@ export const useGameState = (): {
       case "turn":
         setGameState({
           ...gameState,
+          betSize: 0,
           currentRound: "river",
           activePlayers,
           currentPlayer: activePlayers[0],
@@ -197,8 +236,25 @@ export const useGameStateReset = (): {
         HJ: { initialStack: undefined, hands: undefined },
         CO: { initialStack: undefined, hands: undefined },
         BTN: { initialStack: undefined, hands: undefined },
-        SB: { initialStack: undefined, hands: undefined },
-        BB: { initialStack: undefined, hands: undefined },
+        SB: {
+          initialStack: undefined,
+          hands: undefined,
+        },
+        BB: {
+          initialStack: undefined,
+          hands: undefined,
+        },
+      },
+      currentBetSizes: {
+        UTG: 0,
+        UTG1: 0,
+        UTG2: 0,
+        LJ: 0,
+        HJ: 0,
+        CO: 0,
+        BTN: 0,
+        SB: table.sb,
+        BB: table.bb,
       },
       betSize: table.bb,
       potSize: table.bb + table.sb + table.anti,
