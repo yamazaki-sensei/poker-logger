@@ -257,7 +257,7 @@ export const useGameStateReset = (): {
         BB: table.bb,
       },
       betSize: table.bb,
-      potSize: table.bb + table.sb + table.anti,
+      potSize: table.bb + table.sb + table.ante,
       activePlayers: sortPlayersToPreFlopOrder(
         generateInitialPlayers(table.playersCount)
       ),

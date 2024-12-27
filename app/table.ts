@@ -7,14 +7,14 @@ import { useGameState, useGameStateReset } from "./game";
 export interface TableState {
   readonly sb: number;
   readonly bb: number;
-  readonly anti: number;
+  readonly ante: number;
   readonly playersCount: number;
 }
 
 const initialTableState: TableState = {
   sb: 0,
   bb: 0,
-  anti: 0,
+  ante: 0,
   playersCount: 9,
 };
 

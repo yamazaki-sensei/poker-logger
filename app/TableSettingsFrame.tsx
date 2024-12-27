@@ -44,10 +44,10 @@ const Footer = () => {
     });
   };
 
-  const onAntiChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const onAnteChange = (event: ChangeEvent<HTMLInputElement>) => {
     updateTable({
       ...table,
-      anti: Number.parseInt(event.currentTarget.value || "0"),
+      ante: Number.parseInt(event.currentTarget.value || "0"),
     });
   };
 
@@ -121,13 +121,13 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex items-center">
-          Anti:
+          Ante:
           <div className="ml-2">
             <Input
               min={0}
-              value={`${table.anti}`.replace(/^0+/, "") || "0"}
+              value={`${table.ante}`.replace(/^0+/, "") || "0"}
               type="number"
-              onChange={onAntiChange}
+              onChange={onAnteChange}
             />
           </div>
         </div>
