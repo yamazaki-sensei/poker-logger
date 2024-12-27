@@ -69,7 +69,7 @@ export const GameActions = ({
 
   return (
     <div>
-      <div>{`${gameState.activePlayers.length} Players:`}</div>
+      <div>{`${gameState.activePlayers.length} Active Players:`}</div>
       <div className="grid grid-cols-3 gap-1 mt-1">
         {gameState.allPlayers.map((v) => (
           <Button
