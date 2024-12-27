@@ -116,7 +116,7 @@ export const GameActions = ({
             className="items-center p-2 grid grid-cols-12"
           >
             <div className="col-span-12">
-              {actionToText({ position: player, action })}
+              {i + 1}: {actionToText({ position: player, action })}
             </div>
           </div>
         ))}
