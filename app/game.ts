@@ -23,8 +23,8 @@ export interface GameState {
   readonly playersState: Record<Position, PlayerState>;
   readonly currentBetSizes: Record<Position, number>;
   readonly gameIndex: number;
-  readonly activePlayers: Position[];
-  readonly allPlayers: Position[];
+  readonly activePlayers: readonly Position[];
+  readonly allPlayers: readonly Position[];
   readonly betSize: number;
   readonly potSize: number;
   readonly actions: {
@@ -39,9 +39,10 @@ export interface GameState {
     river: [Card] | undefined;
   };
   readonly memo: string;
+  readonly previousState?: GameState;
 }
 
-const gameAtom = atom<GameState>({
+const defaultGameState: GameState = {
   currentRound: "preFlop",
   currentPlayer: "UTG",
   playersState: {
@@ -84,13 +85,17 @@ const gameAtom = atom<GameState>({
     river: undefined,
   },
   memo: "",
-});
+  previousState: undefined,
+};
+
+const gameAtom = atom<GameState>(defaultGameState);
 
 export const useGameState = (): {
   readonly gameState: GameState;
   updatePlayerState: (position: Position, state: PlayerState) => void;
   setMyPosition: (position: Position) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
+  revertLastAction: () => void;
   toNextRound: () => void;
   setCommunityCards: (round: GameRound, cards: Card[]) => void;
   setMemo: (memo: string) => void;
@@ -115,22 +120,26 @@ export const useGameState = (): {
   };
 
   const commitAction = (round: GameRound, action: ActionWithPlayer) => {
+    const copiedAction = { ...action };
+
     const nextPlayers =
-      action.action.type === "fold"
-        ? gameState.activePlayers.filter((v) => v !== action.player)
+      copiedAction.action.type === "fold"
+        ? gameState.activePlayers.filter((v) => v !== copiedAction.player)
         : gameState.activePlayers;
 
     let nextBetSize = gameState.betSize;
     let nextPotSize = gameState.potSize;
     let playersBetSize = gameState.currentBetSizes[action.player];
 
-    if (action.action.type === "raise") {
-      nextPotSize += action.action.amount - playersBetSize;
-      nextBetSize = action.action.amount;
-      playersBetSize = action.action.amount;
+    if (copiedAction.action.type === "raise") {
+      nextPotSize += copiedAction.action.amount - playersBetSize;
+      nextBetSize = copiedAction.action.amount;
+      playersBetSize = copiedAction.action.amount;
     } else if (action.action.type === "checkOrCall") {
-      nextPotSize += gameState.betSize - playersBetSize;
+      const actionAmount = gameState.betSize - playersBetSize;
+      nextPotSize += actionAmount;
       playersBetSize = gameState.betSize;
+      copiedAction.action.amount = actionAmount;
     }
 
     setGameState({
@@ -139,7 +148,7 @@ export const useGameState = (): {
       potSize: nextPotSize,
       actions: {
         ...gameState.actions,
-        [round]: [...gameState.actions[round], action],
+        [round]: [...gameState.actions[round], copiedAction],
       },
       activePlayers: nextPlayers,
       playersState: {
@@ -154,7 +163,16 @@ export const useGameState = (): {
         currentPlayer: gameState.currentPlayer,
         activePlayers: gameState.activePlayers,
       }),
+      previousState: gameState,
     });
+  };
+
+  const revertLastAction = () => {
+    if (!gameState.previousState) {
+      return;
+    }
+
+    setGameState({ ...gameState.previousState, memo: gameState.memo });
   };
 
   const setCommunityCards = (round: GameRound, cards: Card[]) => {
@@ -244,6 +262,7 @@ export const useGameState = (): {
     updatePlayerState,
     setMyPosition,
     commitAction,
+    revertLastAction,
     setCommunityCards,
     toNextRound,
     setMemo,

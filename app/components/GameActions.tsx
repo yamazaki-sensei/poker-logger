@@ -15,6 +15,7 @@ import {
 import { CardSelect } from "./CardSelect";
 import { cardText } from "~/utils/card_util";
 import { Input } from "./ui/input";
+import { Separator } from "./ui/separator";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
@@ -43,7 +44,8 @@ export const GameActions = ({
   round: GameRound;
   onNextRound?: () => void;
 }) => {
-  const { gameState, toNextRound, updatePlayerState } = useGameState();
+  const { gameState, toNextRound, updatePlayerState, revertLastAction } =
+    useGameState();
   const actions = gameState.actions[round];
   const [handsSelectTarget, setHandsSelectTarget] = useState<Position>();
   const handleHandSelectTarget = (position: Position) => {
@@ -117,6 +119,16 @@ export const GameActions = ({
           >
             <div className="col-span-12">
               {i + 1}: {actionToText({ position: player, action })}
+              {i === actions.length - 1 && (
+                <Button
+                  variant="destructive"
+                  className="ml-2"
+                  size="sm"
+                  onClick={revertLastAction}
+                >
+                  取消
+                </Button>
+              )}
             </div>
           </div>
         ))}

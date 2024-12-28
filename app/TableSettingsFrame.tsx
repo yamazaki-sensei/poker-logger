@@ -13,6 +13,7 @@ import { useGameState, useGameStateReset } from "./game";
 import { Separator } from "./components/ui/separator";
 import { loadResults, useResultsWriter } from "./results";
 import { Link } from "react-router";
+import { useToast } from "./hooks/use-toast";
 
 const Footer = () => {
   const { table, updateTable } = useTable();
@@ -141,6 +142,7 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   const { gameState, setMemo } = useGameState();
   const { storeCurrentBoard } = useResultsWriter();
   const { table } = useTable();
+  const { toast } = useToast();
 
   return (
     <div className="relative w-full h-full pb-[200px]">
@@ -164,7 +166,16 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
       </div>
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">
-          <Button onClick={storeCurrentBoard}>現在のボードを保存</Button>
+          <Button
+            onClick={() => {
+              storeCurrentBoard();
+              toast({
+                description: "ボードを保存しました",
+              });
+            }}
+          >
+            現在のボードを保存
+          </Button>
           <div className="flex items-center ml-4">
             <Link to="/results" className="text-sm underline">
               保存したボードを確認

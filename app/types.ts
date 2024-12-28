@@ -40,7 +40,7 @@ export type ActionType = "check" | "fold" | "call" | "raise";
 export type Action =
   | {
       type: "checkOrCall";
-      amount?: undefined;
+      amount?: number;
     }
   | {
       type: "fold";
