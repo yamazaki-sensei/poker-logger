@@ -83,11 +83,7 @@ export const GameActions = ({
             }`}
           >
             <div key={v} className="text-sm h-16 flex justify-center flex-col">
-              <PositionText
-                key={v}
-                position={v}
-                className={gameState.playersState[v].hands ? undefined : "mr-2"}
-              />
+              <PositionText key={v} position={v} />
               {
                 <div className="text-xs">
                   {gameState.playersState[v].hands

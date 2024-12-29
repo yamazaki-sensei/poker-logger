@@ -94,7 +94,6 @@ export default function Results() {
                   results={results}
                   onDelete={() => setIndex(index + 1)}
                 />
-                <div>{resultToHandHistory(results[0].payload)}</div>
               </>
             )}
           />

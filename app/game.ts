@@ -366,7 +366,7 @@ const sortPlayersToPreFlopOrder = (
   );
 };
 
-const sortPlayersToGeneralOrder = (
+export const sortPlayersToGeneralOrder = (
   players: readonly Position[]
 ): Position[] => {
   return players.toSorted((v1, v2) => playOrder[v1] - playOrder[v2]);
@@ -408,7 +408,7 @@ const findFirstPlayer = (playersCount: number): Position => {
   }
 };
 
-const generateInitialPlayers = (playersCount: number): Position[] => {
+export const generateInitialPlayers = (playersCount: number): Position[] => {
   switch (playersCount) {
     case 2:
       return ["SB", "BB"];
