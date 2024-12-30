@@ -55,14 +55,15 @@ const DataTable = ({
               );
               toast({
                 description:
-                  "ハンド履歴をハンドヒストリーフォーマットでクリップボードにコピーしました",
+                  "ハンド履歴メーカーのURLをクリップボードにコピーしました",
               });
             }}
           >
             <TableCell>{format(v.date, "yyyy/MM/dd hh:mm:ss")}</TableCell>
             <TableCell>{v.payload.game.memo}</TableCell>
             <TableCell
-              onClick={() => {
+              onClick={(event) => {
+                event.stopPropagation();
                 removeBoard(i);
                 onDelete();
               }}
