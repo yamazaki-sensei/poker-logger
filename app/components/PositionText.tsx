@@ -14,9 +14,6 @@ export const PositionText = ({
   return (
     <span>
       <span className={`${textStyle} ${className}`}>{position}</span>
-      <span className="text-xs ml-2">
-        {gameState.currentBetSizes[position]}
-      </span>
     </span>
   );
 };

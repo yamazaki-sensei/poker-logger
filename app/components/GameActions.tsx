@@ -44,8 +44,13 @@ export const GameActions = ({
   round: GameRound;
   onNextRound?: () => void;
 }) => {
-  const { gameState, toNextRound, updatePlayerState, revertLastAction } =
-    useGameState();
+  const {
+    gameState,
+    setMyPosition,
+    toNextRound,
+    updatePlayerState,
+    revertLastAction,
+  } = useGameState();
   const actions = gameState.actions[round];
   const [handsSelectTarget, setHandsSelectTarget] = useState<Position>();
   const handleHandSelectTarget = (position: Position) => {
@@ -60,8 +65,9 @@ export const GameActions = ({
     });
     setHandsSelectTarget(undefined);
   };
-  const [currentStackInputRef, setCurrentStackInputRef] =
-    useState<HTMLInputElement | null>(null);
+  const onPositionChange = (v: Position) => {
+    setMyPosition(v);
+  };
 
   const isFolded = (player: Position) =>
     !gameState.activePlayers.includes(player);
@@ -145,14 +151,28 @@ export const GameActions = ({
           }}
         >
           <DialogContent>
-            <DialogTitle>手札を設定</DialogTitle>
-            <DialogDescription />
+            <DialogTitle>
+              <div className="flex">
+                <div className="mt-2">手札を設定</div>
+                <div>
+                  {gameState.myPosition === handsSelectTarget ? (
+                    <div className="mt-2 ml-2">(Hero)</div>
+                  ) : (
+                    <Button
+                      onClick={() =>
+                        handsSelectTarget && onPositionChange(handsSelectTarget)
+                      }
+                      className="ml-4"
+                    >
+                      heroに設定
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </DialogTitle>
             <CardSelect
               count={2}
               onSelect={(cards: Card[]) => {
-                const stack = currentStackInputRef?.value
-                  ? Number(currentStackInputRef?.value)
-                  : undefined;
                 handleHands(cards);
               }}
             />

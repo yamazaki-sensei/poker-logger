@@ -17,7 +17,6 @@ import { useToast } from "./hooks/use-toast";
 
 const Footer = () => {
   const { table, updateTable } = useTable();
-  const { gameState, setMyPosition } = useGameState();
 
   const positions = usePositions();
   const onPlayersCountChange = (v: string) => {
@@ -25,10 +24,6 @@ const Footer = () => {
       ...table,
       playersCount: Number.parseInt(v),
     });
-  };
-
-  const onPositionChange = (v: string) => {
-    setMyPosition(v as Position);
   };
 
   const onSbChange = (event: ChangeEvent<HTMLInputElement>) => {
