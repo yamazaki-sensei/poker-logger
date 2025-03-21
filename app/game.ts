@@ -12,7 +12,6 @@ import { atom, useAtom } from "jotai";
 import { act } from "react";
 
 type PlayerState = {
-  initialStack: number | undefined;
   hands: [Card, Card] | undefined;
 };
 
@@ -46,15 +45,15 @@ const defaultGameState: GameState = {
   currentRound: "preFlop",
   currentPlayer: "UTG",
   playersState: {
-    UTG: { initialStack: undefined, hands: undefined },
-    UTG1: { initialStack: undefined, hands: undefined },
-    UTG2: { initialStack: undefined, hands: undefined },
-    LJ: { initialStack: undefined, hands: undefined },
-    HJ: { initialStack: undefined, hands: undefined },
-    CO: { initialStack: undefined, hands: undefined },
-    BTN: { initialStack: undefined, hands: undefined },
-    SB: { initialStack: undefined, hands: undefined },
-    BB: { initialStack: undefined, hands: undefined },
+    UTG: { hands: undefined },
+    UTG1: { hands: undefined },
+    UTG2: { hands: undefined },
+    LJ: { hands: undefined },
+    HJ: { hands: undefined },
+    CO: { hands: undefined },
+    BTN: { hands: undefined },
+    SB: { hands: undefined },
+    BB: { hands: undefined },
   },
   currentBetSizes: {
     UTG: 0,
@@ -127,25 +126,8 @@ export const useGameState = (): {
         ? gameState.activePlayers.filter((v) => v !== copiedAction.player)
         : gameState.activePlayers;
 
-    let nextBetSize = gameState.betSize;
-    let nextPotSize = gameState.potSize;
-    let playersBetSize = gameState.currentBetSizes[action.player];
-
-    if (copiedAction.action.type === "raise") {
-      nextPotSize += copiedAction.action.amount - playersBetSize;
-      nextBetSize = copiedAction.action.amount;
-      playersBetSize = copiedAction.action.amount;
-    } else if (action.action.type === "checkOrCall") {
-      const actionAmount = gameState.betSize - playersBetSize;
-      nextPotSize += actionAmount;
-      playersBetSize = gameState.betSize;
-      copiedAction.action.amount = actionAmount;
-    }
-
     setGameState({
       ...gameState,
-      betSize: nextBetSize,
-      potSize: nextPotSize,
       actions: {
         ...gameState.actions,
         [round]: [...gameState.actions[round], copiedAction],
@@ -153,10 +135,6 @@ export const useGameState = (): {
       activePlayers: nextPlayers,
       playersState: {
         ...gameState.playersState,
-      },
-      currentBetSizes: {
-        ...gameState.currentBetSizes,
-        [action.player]: playersBetSize,
       },
       currentPlayer: findNextPlayer({
         round: gameState.currentRound,

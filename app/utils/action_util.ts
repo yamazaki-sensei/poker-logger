@@ -11,7 +11,7 @@ export const actionToText = ({
     case "checkOrCall":
       return `${position} が check / call`;
     case "raise":
-      return `${position} が ${action.amount} に raise`;
+      return `${position} が bet / raise (サイズ: ${action.amount})`;
     case "fold":
       return `${position} が fold`;
   }

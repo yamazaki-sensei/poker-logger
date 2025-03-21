@@ -48,7 +48,7 @@ export type Action =
     }
   | {
       type: "raise";
-      amount: number;
+      amount: "S" | "M" | "L" | "LL" | "AI";
     };
 
 export type ActionWithPlayer = {

@@ -40,22 +40,6 @@ function TabsTrigger({
   );
 }
 
-const ChipCounts = () => {
-  const { gameState } = useGameState();
-  return (
-    <div className="flex items-center text-xs ml-2">
-      <div className="flex flex-col items-center px-2">
-        <div>ベット</div>
-        <div>{gameState.betSize}</div>
-      </div>
-      <div className="flex flex-col items-center px-2">
-        <div>ポット</div>
-        <div>{gameState.potSize}</div>
-      </div>
-    </div>
-  );
-};
-
 const RoundTitle = ({ round }: { round: GameRound }) => {
   const [cardsDialogOpened, setCardsDialogOpened] = useState(false);
   const { gameState, setCommunityCards } = useGameState();
@@ -63,7 +47,6 @@ const RoundTitle = ({ round }: { round: GameRound }) => {
     return (
       <div className="flex items-center">
         <h2 className="text-lg font-semibold mb-2">{gameRoundText(round)}</h2>
-        <ChipCounts />
       </div>
     );
   }
@@ -78,7 +61,6 @@ const RoundTitle = ({ round }: { round: GameRound }) => {
   return (
     <div className="flex items-center">
       <h2 className="text-lg font-semibold mb-2">{gameRoundText(round)}</h2>
-      <ChipCounts />
       <div className="ml-2 mb-2">
         <Dialog open={cardsDialogOpened} onOpenChange={setCardsDialogOpened}>
           <Button variant="outline" onClick={() => setCardsDialogOpened(true)}>

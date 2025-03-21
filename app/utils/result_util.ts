@@ -8,7 +8,6 @@ type StoryMakerResult = {
   readonly BB: string;
   readonly SB: string;
   readonly Ante: string;
-  readonly StartChipCount: string;
   readonly ViewMode: "Chip";
   readonly Hand: string;
   readonly Board: string;
@@ -56,9 +55,6 @@ const buildStoryMakerResult = (result: BoardResult): StoryMakerResult => {
   const sortedPlayers = sortPlayersToGeneralOrder(
     generateInitialPlayers(table.playersCount)
   );
-  const StartChipCount = sortedPlayers
-    .map((player) => result.game.playersState[player].initialStack)
-    .join(",");
   const Hand = sortedPlayers
     .map((v, i) => {
       const index = v === game.myPosition ? 0 : i + 1;
@@ -87,7 +83,6 @@ const buildStoryMakerResult = (result: BoardResult): StoryMakerResult => {
     Ante: `${
       table.ante / table.playersCount - ((table.ante / table.playersCount) % 10)
     }`,
-    StartChipCount,
     ViewMode: "Chip",
     Hand,
     Board,

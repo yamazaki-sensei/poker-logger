@@ -51,12 +51,11 @@ export const GameActions = ({
   const handleHandSelectTarget = (position: Position) => {
     setHandsSelectTarget(position);
   };
-  const handleHands = (hands: Card[], stack: number | undefined) => {
+  const handleHands = (hands: Card[]) => {
     if (!handsSelectTarget) {
       return;
     }
     updatePlayerState(handsSelectTarget, {
-      initialStack: stack,
       hands: [hands[0], hands[1]],
     });
     setHandsSelectTarget(undefined);
@@ -91,13 +90,6 @@ export const GameActions = ({
                         gameState.playersState[v].hands[0]
                       )} ${cardText(gameState.playersState[v].hands[1])}`
                     : "手札: ?"}
-                </div>
-              }
-              {
-                <div className="text-[0.625rem]">
-                  {gameState.playersState[v].initialStack
-                    ? gameState.playersState[v].initialStack
-                    : "初期スタック: ?"}
                 </div>
               }
             </div>
@@ -153,30 +145,15 @@ export const GameActions = ({
           }}
         >
           <DialogContent>
-            <DialogTitle>手札・初期スタックを設定</DialogTitle>
+            <DialogTitle>手札を設定</DialogTitle>
             <DialogDescription />
-            <div>
-              <span className="text-sm">初期スタック</span>
-              <div className="flex items-center w-48">
-                {handsSelectTarget && (
-                  <Input
-                    ref={setCurrentStackInputRef}
-                    type="number"
-                    defaultValue={
-                      gameState.playersState[handsSelectTarget].initialStack
-                    }
-                  />
-                )}
-                <div className="ml-2">chips</div>
-              </div>
-            </div>
             <CardSelect
               count={2}
               onSelect={(cards: Card[]) => {
                 const stack = currentStackInputRef?.value
                   ? Number(currentStackInputRef?.value)
                   : undefined;
-                handleHands(cards, stack);
+                handleHands(cards);
               }}
             />
           </DialogContent>

@@ -77,26 +77,6 @@ const Footer = () => {
             </Select>
           </div>
         </div>
-        <div className="flex items-center ml-2">
-          <div className="text-sm">Hero:</div>
-          <div className="ml-2">
-            <Select
-              value={`${gameState.myPosition}`}
-              onValueChange={onPositionChange}
-            >
-              <SelectTrigger className="flex items-center">
-                <span className="ml-1">{gameState.myPosition}</span>
-              </SelectTrigger>
-              <SelectContent align="center" position="popper">
-                {positions.map((v) => (
-                  <SelectItem key={v} value={v}>
-                    {v}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
       </div>
       <div className="grid grid-cols-3 mt-2">
         <div className="flex items-center pr-2">
