@@ -1,8 +1,8 @@
 import { ChevronLeft, TrashIcon } from "lucide-react";
 import { Suspense, use, useState, type ReactNode } from "react";
-import { Link, useLoaderData } from "react-router";
+import { Form, Link, useLoaderData, useSubmit } from "react-router";
 import { Spinner } from "~/components/ui/spinner";
-import { loadResults, useResultsWriter, type BoardResult } from "~/results";
+import { loadResults, removeBoard, type BoardResult } from "~/results";
 import { format } from "date-fns";
 import {
   Table,
@@ -14,22 +14,33 @@ import {
 } from "~/components/ui/table";
 import { resultToHandHistory } from "~/utils/result_util";
 import { useToast } from "~/hooks/use-toast";
+import { Button } from "@radix-ui/themes";
+import type { Route } from "./+types/results";
 
 export async function clientLoader() {
   return await loadResults();
 }
 
-export async function clientAction() {}
+export async function clientAction({
+  request,
+  params,
+}: Route.ClientActionArgs) {
+  console.log(request);
+  console.log(params);
+  const formData = await request.formData();
+  const index = formData.get("index");
+  await removeBoard(Number(index));
+
+  return await loadResults();
+}
 
 const DataTable = ({
   results,
-  onDelete,
 }: {
   results: { date: Date; payload: BoardResult }[];
-  onDelete: () => void;
 }) => {
-  const { removeBoard } = useResultsWriter();
   const { toast } = useToast();
+  const submit = useSubmit();
   return (
     <Table>
       <TableHeader>
@@ -56,14 +67,27 @@ const DataTable = ({
           >
             <TableCell>{format(v.date, "yyyy/MM/dd hh:mm:ss")}</TableCell>
             <TableCell>{v.payload.game.memo}</TableCell>
-            <TableCell
-              onClick={(event) => {
-                event.stopPropagation();
-                removeBoard(i);
-                onDelete();
-              }}
-            >
-              <TrashIcon />
+            <TableCell>
+              <Form
+                method="POST"
+                onSubmit={(event) => {
+                  const formData = new FormData(event.currentTarget);
+                  formData.set("index", `${i}`);
+                  submit(formData);
+                }}
+              >
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  name="index"
+                  value={i}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                  }}
+                >
+                  <TrashIcon />
+                </Button>
+              </Form>
             </TableCell>
           </TableRow>
         ))}
@@ -74,7 +98,6 @@ const DataTable = ({
 
 export default function Results() {
   const results = useLoaderData<typeof clientLoader>();
-  const [index, setIndex] = useState(0);
   return (
     <>
       <div className="p-4">
@@ -83,8 +106,8 @@ export default function Results() {
         </Link>
       </div>
       <Suspense fallback={<Spinner />}>
-        <div className="p-4" key={index}>
-          <DataTable results={results} onDelete={() => setIndex(index + 1)} />
+        <div className="p-4">
+          <DataTable results={results} />
         </div>
       </Suspense>
     </>

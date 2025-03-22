@@ -82,7 +82,6 @@ export const loadResults = async (): Promise<
 
 export const useResultsWriter = (): {
   storeCurrentBoard: () => void;
-  removeBoard: (index: number) => void;
 } => {
   const { gameState } = useGameState();
   const { table } = useTable();
@@ -111,8 +110,6 @@ export const useResultsWriter = (): {
         },
       };
 
-      console.log("@@@@@@@@@@@@");
-      console.log(newItem);
       store.add(newItem);
 
       transaction.oncomplete = () => {
@@ -127,33 +124,32 @@ export const useResultsWriter = (): {
     }
   };
 
-  const removeBoard = async (index: number) => {
-    try {
-      const results = await loadResults();
-      if (index >= 0 && index < results.length) {
-        const dateToRemove = results[index].date.toISOString();
-
-        const db = await openDatabase();
-        const transaction = db.transaction(storeName, "readwrite");
-        const store = transaction.objectStore(storeName);
-
-        store.delete(dateToRemove);
-
-        transaction.oncomplete = () => {
-          db.close();
-        };
-
-        transaction.onerror = () => {
-          console.error("Error removing board:", transaction.error);
-        };
-      }
-    } catch (error) {
-      console.error("Error removing board:", error);
-    }
-  };
-
   return {
     storeCurrentBoard,
-    removeBoard,
   };
+};
+
+export const removeBoard = async (index: number) => {
+  try {
+    const results = await loadResults();
+    if (index >= 0 && index < results.length) {
+      const dateToRemove = results[index].date.toISOString();
+
+      const db = await openDatabase();
+      const transaction = db.transaction(storeName, "readwrite");
+      const store = transaction.objectStore(storeName);
+
+      store.delete(dateToRemove);
+
+      transaction.oncomplete = () => {
+        db.close();
+      };
+
+      transaction.onerror = () => {
+        console.error("Error removing board:", transaction.error);
+      };
+    }
+  } catch (error) {
+    console.error("Error removing board:", error);
+  }
 };
