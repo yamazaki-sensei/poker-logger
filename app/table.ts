@@ -1,6 +1,5 @@
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import type { Position } from "./types";
 import { useGameStateReset } from "./game";
 
 export interface TableState {
@@ -35,30 +34,4 @@ export const useTable = (): {
     table: tableState,
     updateTable,
   };
-};
-
-export const usePositions = (): Position[] => {
-  const { table } = useTable();
-  const playersCount = table.playersCount;
-
-  switch (playersCount) {
-    case 2:
-      return ["SB", "BB"];
-    case 3:
-      return ["SB", "BB", "BTN"];
-    case 4:
-      return ["SB", "BB", "UTG", "BTN"];
-    case 5:
-      return ["SB", "BB", "UTG", "CO", "BTN"];
-    case 6:
-      return ["SB", "BB", "UTG", "HJ", "CO", "BTN"];
-    case 7:
-      return ["SB", "BB", "UTG", "UTG1", "HJ", "CO", "BTN"];
-    case 8:
-      return ["SB", "BB", "UTG", "UTG1", "LJ", "HJ", "CO", "BTN"];
-    case 9:
-      return ["SB", "BB", "UTG", "UTG1", "UTG2", "LJ", "HJ", "CO", "BTN"];
-    default:
-      return ["SB", "BB"];
-  }
 };

@@ -1,5 +1,5 @@
-import type { ChangeEvent, ReactNode } from "react";
-import { useTable, usePositions } from "./table";
+import { useState, type ChangeEvent, type ReactNode } from "react";
+import { useTable } from "./table";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import {
@@ -13,11 +13,11 @@ import { Separator } from "./components/ui/separator";
 import { useResultsWriter } from "./results";
 import { Link } from "react-router";
 import { useToast } from "./hooks/use-toast";
+import { Dialog, DialogTitle, DialogContent } from "./components/ui/dialog";
 
 const Footer = () => {
   const { table, updateTable } = useTable();
 
-  const positions = usePositions();
   const onPlayersCountChange = (v: string) => {
     updateTable({
       ...table,
@@ -113,10 +113,15 @@ const Footer = () => {
 
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   const { resetGame } = useGameStateReset();
-  const { gameState, setMemo } = useGameState();
+  const { gameState, setMemo, setMyPosition } = useGameState();
   const { storeCurrentBoard } = useResultsWriter();
   const { table } = useTable();
   const { toast } = useToast();
+  const [positionDialogShown, setPositionDialogShown] = useState(false);
+  const reset = () => {
+    resetGame(table);
+    setPositionDialogShown(true);
+  };
 
   return (
     <div className="relative w-full h-full pb-[200px]">
@@ -130,13 +135,7 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
           maxLength={30}
           onChange={(event) => setMemo(event.currentTarget.value)}
         />
-        <Button
-          onClick={() => {
-            resetGame(table);
-          }}
-        >
-          リセット
-        </Button>
+        <Button onClick={reset}>リセット</Button>
       </div>
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">
@@ -160,6 +159,26 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
         <div className="p-2">
           <Footer />
         </div>
+      </div>
+      <div>
+        <Dialog open={positionDialogShown}>
+          <DialogContent className="[&>button]:hidden">
+            <DialogTitle>heroポジションを設定</DialogTitle>
+            <div className="grid grid-cols-3 gap-2">
+              {gameState.allPlayers.map((p) => (
+                <Button
+                  key={p}
+                  onClick={() => {
+                    setMyPosition(p);
+                    setPositionDialogShown(false);
+                  }}
+                >
+                  {p}
+                </Button>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

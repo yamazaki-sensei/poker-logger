@@ -1,4 +1,4 @@
-import { use, useState } from "react";
+import { useState } from "react";
 import { useGameState } from "~/game";
 import type { GameRound, Action, Position, Card } from "~/types";
 import { PlayerAction } from "./Action";
@@ -6,16 +6,9 @@ import { actionToText } from "~/utils/action_util";
 import { Button } from "./ui/button";
 import { gameRoundText } from "~/utils/round_util";
 import { PositionText } from "./PositionText";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "./ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "./ui/dialog";
 import { CardSelect } from "./CardSelect";
 import { cardText } from "~/utils/card_util";
-import { Input } from "./ui/input";
-import { Separator } from "./ui/separator";
 
 const ActionArea = ({ round }: { round: GameRound }) => {
   const { gameState, commitAction } = useGameState();
@@ -44,13 +37,8 @@ export const GameActions = ({
   round: GameRound;
   onNextRound?: () => void;
 }) => {
-  const {
-    gameState,
-    setMyPosition,
-    toNextRound,
-    updatePlayerState,
-    revertLastAction,
-  } = useGameState();
+  const { gameState, toNextRound, updatePlayerState, revertLastAction } =
+    useGameState();
   const actions = gameState.actions[round];
   const [handsSelectTarget, setHandsSelectTarget] = useState<Position>();
   const handleHandSelectTarget = (position: Position) => {
@@ -64,9 +52,6 @@ export const GameActions = ({
       hands: [hands[0], hands[1]],
     });
     setHandsSelectTarget(undefined);
-  };
-  const onPositionChange = (v: Position) => {
-    setMyPosition(v);
   };
 
   const isFolded = (player: Position) =>
@@ -154,20 +139,6 @@ export const GameActions = ({
             <DialogTitle>
               <div className="flex">
                 <div className="mt-2">手札を設定</div>
-                <div>
-                  {gameState.myPosition === handsSelectTarget ? (
-                    <div className="mt-2 ml-2">(Hero)</div>
-                  ) : (
-                    <Button
-                      onClick={() =>
-                        handsSelectTarget && onPositionChange(handsSelectTarget)
-                      }
-                      className="ml-4"
-                    >
-                      heroに設定
-                    </Button>
-                  )}
-                </div>
               </div>
             </DialogTitle>
             <CardSelect
