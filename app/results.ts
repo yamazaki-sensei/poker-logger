@@ -49,12 +49,10 @@ export const loadResults = async (): Promise<
   try {
     const db = await openDatabase();
     return new Promise((resolve, reject) => {
-      console.log("########## 1");
       const transaction = db.transaction(storeName, "readonly");
       const store = transaction.objectStore(storeName);
       const request = store.getAll();
 
-      console.log("########## 2");
       request.onsuccess = () => {
         const results = request.result as {
           date: string;
@@ -68,9 +66,7 @@ export const loadResults = async (): Promise<
         );
       };
 
-      console.log("########## 3");
       request.onerror = () => {
-        console.log("########## 4");
         reject(request.error);
       };
 

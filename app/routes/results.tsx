@@ -1,6 +1,6 @@
 import { ChevronLeft, TrashIcon } from "lucide-react";
 import { Suspense, use, useState, type ReactNode } from "react";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Spinner } from "~/components/ui/spinner";
 import { loadResults, useResultsWriter, type BoardResult } from "~/results";
 import { format } from "date-fns";
@@ -15,16 +15,11 @@ import {
 import { resultToHandHistory } from "~/utils/result_util";
 import { useToast } from "~/hooks/use-toast";
 
-const DataLoader = ({
-  consumer,
-}: {
-  consumer: (results: { date: Date; payload: BoardResult }[]) => ReactNode;
-}) => {
-  const [items] =
-    useState<Promise<{ date: Date; payload: BoardResult }[]>>(loadResults);
-  const results = use(items);
-  return consumer(results);
-};
+export async function clientLoader() {
+  return await loadResults();
+}
+
+export async function clientAction() {}
 
 const DataTable = ({
   results,
@@ -78,6 +73,7 @@ const DataTable = ({
 };
 
 export default function Results() {
+  const results = useLoaderData<typeof clientLoader>();
   const [index, setIndex] = useState(0);
   return (
     <>
@@ -88,16 +84,7 @@ export default function Results() {
       </div>
       <Suspense fallback={<Spinner />}>
         <div className="p-4" key={index}>
-          <DataLoader
-            consumer={(results) => (
-              <>
-                <DataTable
-                  results={results}
-                  onDelete={() => setIndex(index + 1)}
-                />
-              </>
-            )}
-          />
+          <DataTable results={results} onDelete={() => setIndex(index + 1)} />
         </div>
       </Suspense>
     </>
