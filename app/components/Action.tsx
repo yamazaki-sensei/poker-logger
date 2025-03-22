@@ -1,4 +1,4 @@
-import type { Action } from "~/types";
+import { amountStringMap, type Action } from "~/types";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -26,20 +26,20 @@ export const PlayerAction = ({
         </div>
       </div>
       <div className="grid grid-cols-5 gap-2 mt-2">
-        <Button onClick={() => onAction({ type: "raise", amount: "S" })}>
-          S
+        <Button onClick={() => onAction({ type: "betOrRaise", amount: "S" })}>
+          {amountStringMap.S}
         </Button>
-        <Button onClick={() => onAction({ type: "raise", amount: "M" })}>
-          M
+        <Button onClick={() => onAction({ type: "betOrRaise", amount: "M" })}>
+          {amountStringMap.M}
         </Button>
-        <Button onClick={() => onAction({ type: "raise", amount: "L" })}>
-          L
+        <Button onClick={() => onAction({ type: "betOrRaise", amount: "L" })}>
+          {amountStringMap.L}
         </Button>
-        <Button onClick={() => onAction({ type: "raise", amount: "LL" })}>
-          LL
+        <Button onClick={() => onAction({ type: "betOrRaise", amount: "LL" })}>
+          {amountStringMap.LL}
         </Button>
-        <Button onClick={() => onAction({ type: "raise", amount: "AI" })}>
-          AI
+        <Button onClick={() => onAction({ type: "betOrRaise", amount: "AI" })}>
+          {amountStringMap.AI}
         </Button>
       </div>
     </>

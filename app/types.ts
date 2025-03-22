@@ -37,18 +37,25 @@ export type Card = {
 export type GameRound = "preFlop" | "flop" | "turn" | "river";
 
 export type ActionType = "check" | "fold" | "call" | "raise";
+export type ActionAmount = "S" | "M" | "L" | "LL" | "AI";
+export const amountStringMap: Record<ActionAmount, string> = {
+  S: "小",
+  M: "中",
+  L: "大",
+  LL: "超大",
+  AI: "オールイン",
+};
+
 export type Action =
   | {
       type: "checkOrCall";
-      amount?: number;
     }
   | {
       type: "fold";
-      amount?: undefined;
     }
   | {
-      type: "raise";
-      amount: "S" | "M" | "L" | "LL" | "AI";
+      type: "betOrRaise";
+      amount: ActionAmount;
     };
 
 export type ActionWithPlayer = {

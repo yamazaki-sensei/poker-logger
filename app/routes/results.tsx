@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { resultToHandHistory } from "~/utils/result_util";
+import { resultToHumanReadableString } from "~/utils/result_util";
 import { useToast } from "~/hooks/use-toast";
 import { Button } from "@radix-ui/themes";
 import type { Route } from "./+types/results";
@@ -57,7 +57,7 @@ const DataTable = ({
             className="hover:bg-gray-100 cursor-pointer p-4"
             onClick={async () => {
               await navigator.clipboard.writeText(
-                resultToHandHistory(v.payload)
+                resultToHumanReadableString(v.payload)
               );
               toast({
                 description:

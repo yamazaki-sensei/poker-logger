@@ -1,4 +1,4 @@
-import type { Action, Position } from "~/types";
+import { amountStringMap, type Action, type Position } from "~/types";
 
 export const actionToText = ({
   position,
@@ -10,8 +10,10 @@ export const actionToText = ({
   switch (action.type) {
     case "checkOrCall":
       return `${position} が check / call`;
-    case "raise":
-      return `${position} が bet / raise (サイズ: ${action.amount})`;
+    case "betOrRaise":
+      return `${position} が bet / raise (サイズ: ${
+        amountStringMap[action.amount]
+      })`;
     case "fold":
       return `${position} が fold`;
   }

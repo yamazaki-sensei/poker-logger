@@ -1,117 +1,74 @@
-import { generateInitialPlayers, sortPlayersToGeneralOrder } from "~/game";
 import type { BoardResult } from "~/results";
-import type { Action, Card, Position } from "~/types";
+import type { Action, ActionAmount, Card, Position } from "~/types";
+import { cardText } from "./card_util";
 
-type StoryMakerResult = {
-  readonly PlayerCount: string;
-  readonly HeroPosition: string;
-  readonly BB: string;
-  readonly SB: string;
-  readonly Ante: string;
-  readonly ViewMode: "Chip";
-  readonly Hand: string;
-  readonly Board: string;
-  readonly Preflop: string;
-  readonly Flop: string;
-  readonly Turn: string;
-  readonly River: string;
-};
-
-const positionToIndex = (position: Position, playersCount: number): number => {
-  const sortedPlayers = sortPlayersToGeneralOrder(
-    generateInitialPlayers(playersCount)
-  );
-  return sortedPlayers.indexOf(position) + 1;
-};
-
-const cardToText = (card: Card | undefined): string => {
-  if (!card) {
-    return "";
-  }
-  return `${card.number}${card.suit}`;
-};
-
-const actionsToText = (
-  source: { player: Position; action: Action }[]
-): string => {
-  return source
-    .map((v) => {
-      if (v.action.type === "fold") {
-        return "f";
+const actionsToReadableString = (
+  actions: { player: Position; action: Action }[]
+) => {
+  return actions
+    .map(({ player, action }) => {
+      if (action.type === "fold") {
+        return `${player} フォールド`;
       }
-      if (v.action.type === "checkOrCall") {
-        return `c:${v.action.amount}`;
+      if (action.type === "checkOrCall") {
+        return `${player} チェック or コール`;
       }
-      if (v.action.type === "raise") {
-        return `r:${v.action.amount}`;
+      if (action.type === "betOrRaise") {
+        return `${player} ベット or レイズ, サイズ:  ${action.amount}`;
       }
       return "";
     })
-    .join(",");
+    .join(" -> ");
 };
 
-const buildStoryMakerResult = (result: BoardResult): StoryMakerResult => {
-  const { game, table } = result;
-  const sortedPlayers = sortPlayersToGeneralOrder(
-    generateInitialPlayers(table.playersCount)
-  );
-  const Hand = sortedPlayers
-    .map((v, i) => {
-      const index = v === game.myPosition ? 0 : i + 1;
-      return `${index}:${cardToText(
-        result.game.playersState[v].hands?.[0]
-      )}${cardToText(result.game.playersState[v].hands?.[1])}`;
-    })
-    .join(",");
-  const Board = [
-    ...(result.game.communityCards.flop ?? []),
-    ...(result.game.communityCards.turn ?? []),
-    ...(result.game.communityCards.river ?? []),
-  ]
-    .map(cardToText)
-    .join("");
-  const Preflop = actionsToText(result.game.actions.preFlop);
-  const Flop = actionsToText(result.game.actions.flop);
-  const Turn = actionsToText(result.game.actions.turn);
-  const River = actionsToText(result.game.actions.river);
+export const resultToHumanReadableString = (result: BoardResult): string => {
+  const playersCount = `人数: ${result.table.playersCount}`;
+  const heroPosition = result.game.myPosition;
+  const hero = `Hero: ${heroPosition}`;
+  const heroHands = result.game.playersState[heroPosition].hands;
+  const heroHandsText = heroHands
+    ? `Heroのハンド: ${result.game.playersState[heroPosition].hands
+        ?.map(cardText)
+        .join(", ")}`
+    : "";
+  const preFlop = `PreFlopのアクション: ${actionsToReadableString(
+    result.game.actions.preFlop
+  )}`;
 
-  return {
-    PlayerCount: `${table.playersCount}`,
-    HeroPosition: `${positionToIndex(game.myPosition, table.playersCount)}`,
-    BB: `${table.bb}`,
-    SB: `${table.sb}`,
-    Ante: `${
-      table.ante / table.playersCount - ((table.ante / table.playersCount) % 10)
-    }`,
-    ViewMode: "Chip",
-    Hand,
-    Board,
-    Preflop,
-    Flop,
-    Turn,
-    River,
-  };
-};
+  const flopCards = result.game.communityCards.flop?.at(0)
+    ? `Flopのカード: ${result.game.communityCards.flop
+        ?.map(cardText)
+        .join(" ")}`
+    : "";
+  const flopActions =
+    result.game.actions.flop.length > 0
+      ? `Flopのアクション: ${actionsToReadableString(result.game.actions.flop)}`
+      : "";
 
-// https://pokertrainer.jp/StoryMaker/?
-// PlayerCount=4&
-// HeroPosition=3&
-// BB=200&
-// SB=100&
-// Ante=200&
-// StartChipCount=20000,20000,20000,20000&
-// ViewMode=Chip&
-// Hand=0:6dQc,4:KsQd,1:7c8c,2:9hAc&
-// Board=6cTdKcTsQd&
-// Preflop=r:600,f,c:500,c:400&
-// Flop=&
-// Turn=&
-// River=&
-// WinPlayerPosition=&
-// HideBetChip=0
+  const turnCard = result.game.communityCards.turn?.at(0)
+    ? `Turnのカード: ${result.game.communityCards.turn?.map(cardText)}`
+    : "";
+  const turnActions =
+    result.game.actions.turn.length > 0
+      ? `Turnのアクション: ${actionsToReadableString(result.game.actions.turn)}`
+      : "";
 
-export const resultToHandHistory = (result: BoardResult): string => {
-  const storyMakerResult = buildStoryMakerResult(result);
-  const query = new URLSearchParams(storyMakerResult).toString();
-  return `https://pokertrainer.jp/StoryMaker/?${query}`;
+  const riverCard = result.game.communityCards.river?.at(0)
+    ? `Riverのカード: ${result.game.communityCards.river?.map(cardText)}`
+    : "";
+  const riverActions =
+    result.game.actions.river.length > 0
+      ? `Riverのアクション: ${actionsToReadableString(
+          result.game.actions.river
+        )}`
+      : "";
+
+  const prefix =
+    "テキサスホールデムの以下の状況で、heroが取るべきだったアクションを教えてください。";
+
+  const suffix = `※ プリフロップでは3bb以下のオープンを中 それ以上を大としています。
+ベットサイズは0.5ポット以下を小 1ポット以下を中 1.5ポット以下を大 それ以上を超大 としています。
+レイズは2倍以下のサイズを中 2倍以上3倍以下を大 3倍以上を超大としています。`;
+
+  return `${prefix}\n${playersCount}\n${hero}\n${heroHandsText}\n\n${preFlop}\n${flopCards}\n${flopActions}\n${turnCard}${turnActions}\n${riverCard}\n${riverActions}\n\n${suffix}`;
 };
