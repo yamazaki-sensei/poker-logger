@@ -8,10 +8,9 @@ import {
   SelectTrigger,
   SelectContent,
 } from "./components/ui/select";
-import type { Card, Position } from "./types";
 import { useGameState, useGameStateReset } from "./game";
 import { Separator } from "./components/ui/separator";
-import { loadResults, useResultsWriter } from "./results";
+import { useResultsWriter } from "./results";
 import { Link } from "react-router";
 import { useToast } from "./hooks/use-toast";
 
