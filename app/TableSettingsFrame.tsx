@@ -13,10 +13,13 @@ import { useResultsWriter } from "./results";
 import { Link } from "react-router";
 import { useToast } from "./hooks/use-toast";
 import { Dialog, DialogTitle, DialogContent } from "./components/ui/dialog";
+import { stackSizes, type StackSize } from "./types";
+import { stackSizeToText } from "./utils/stack_util";
 
 export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
   const { resetGame } = useGameStateReset();
-  const { gameState, setMemo, setMyPosition } = useGameState();
+  const { gameState, setMemo, setMyPosition, setEffectiveStack } =
+    useGameState();
   const { storeCurrentBoard } = useResultsWriter();
   const { toast } = useToast();
   const [positionDialogShown, setPositionDialogShown] = useState(false);
@@ -33,14 +36,49 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const onEsChange = (v: StackSize) => {
+    setEffectiveStack(v);
+  };
+
   return (
     <div className="relative w-full h-full pb-[200px]">
       {children}
-
       <div className="flex justify-end flex-1 p-4">
+        <div>
+          <div className="flex items-center">
+            ES:
+            <div className="ml-2">
+              <Select
+                value={`${table.playersCount}`}
+                onValueChange={onEsChange}
+              >
+                <SelectTrigger>
+                  <div className="flex items-center">
+                    <span className="ml-1">
+                      {gameState.effectiveStack
+                        ? stackSizeToText(gameState.effectiveStack)
+                        : "未設定"}
+                    </span>
+                  </div>
+                </SelectTrigger>
+                <SelectContent position="popper">
+                  {stackSizes.map((v) => (
+                    <SelectItem
+                      key={v}
+                      value={`${v}`}
+                      className="cursor-pointer"
+                    >
+                      {stackSizeToText(v)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
         <Input
-          placeholder="簡単なメモ(30文字以内)"
-          className="mr-2"
+          placeholder="簡単なメモ"
+          className="mx-2"
           value={gameState.memo}
           maxLength={30}
           onChange={(event) => setMemo(event.currentTarget.value)}

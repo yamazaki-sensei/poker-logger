@@ -97,6 +97,7 @@ export const useResultsWriter = (): {
         playersState: gameState.playersState,
         memo: gameState.memo,
         potSize: gameState.potSize,
+        effectiveStack: gameState.effectiveStack,
       };
 
       const transaction = db.transaction(storeName, "readwrite");

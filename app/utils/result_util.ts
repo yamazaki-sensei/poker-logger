@@ -1,6 +1,7 @@
 import type { BoardResult } from "~/results";
 import type { Action, ActionAmount, Card, Position } from "~/types";
 import { cardText } from "./card_util";
+import { stackSizeToText } from "./stack_util";
 
 const actionsToReadableString = (
   actions: { player: Position; action: Action }[]
@@ -63,12 +64,16 @@ export const resultToHumanReadableString = (result: BoardResult): string => {
         )}`
       : "";
 
+  const effectiveStack = result.game.effectiveStack
+    ? `エフェクティブスタック: ${stackSizeToText(result.game.effectiveStack)}`
+    : "";
+
   const prefix =
-    "テキサスホールデムの以下の状況で、heroが取るべきだったアクションを教えてください。";
+    "テキサスホールデムの以下の状況で、heroが取るべきだったアクションをGTOの観点から教えてください。";
 
   const suffix = `※ プリフロップでは3bb以下のオープンを中 それ以上を大としています。
 ベットサイズは0.5ポット以下を小 1ポット以下を中 1.5ポット以下を大 それ以上を超大 としています。
-レイズは2倍以下のサイズを中 2倍以上3倍以下を大 3倍以上を超大としています。`;
+レイズは2倍以下のサイズを小 2倍以上3倍以下を中 3倍以上を大としています。`;
 
-  return `${prefix}\n${playersCount}\n${hero}\n${heroHandsText}\n\n${preFlop}\n${flopCards}\n${flopActions}\n${turnCard}${turnActions}\n${riverCard}\n${riverActions}\n\n${suffix}`;
+  return `${prefix}\n${playersCount}\n${hero}\n${heroHandsText}\n\n${preFlop}\n${flopCards}\n${flopActions}\n${turnCard}${turnActions}\n${riverCard}\n${riverActions}\n${effectiveStack}\n\n${suffix}`;
 };

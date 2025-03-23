@@ -1,7 +1,5 @@
 import { amountStringMap, type Action } from "~/types";
-import { useState } from "react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 
 export const PlayerAction = ({
   onAction,

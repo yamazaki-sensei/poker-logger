@@ -93,6 +93,7 @@ export const useGameState = (): {
   readonly gameState: GameState;
   updatePlayerState: (position: Position, state: PlayerState) => void;
   setMyPosition: (position: Position) => void;
+  setEffectiveStack: (stack: StackSize) => void;
   commitAction: (round: GameRound, action: ActionWithPlayer) => void;
   revertLastAction: () => void;
   toNextRound: () => void;
@@ -235,6 +236,10 @@ export const useGameState = (): {
     setGameState({ ...gameState, memo });
   };
 
+  const setEffectiveStack = (stack: StackSize) => {
+    setGameState({ ...gameState, effectiveStack: stack });
+  };
+
   return {
     gameState,
     updatePlayerState,
@@ -244,6 +249,7 @@ export const useGameState = (): {
     setCommunityCards,
     toNextRound,
     setMemo,
+    setEffectiveStack,
   };
 };
 

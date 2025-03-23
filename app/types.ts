@@ -63,4 +63,5 @@ export type ActionWithPlayer = {
   action: Action;
 };
 
-export type StackSize = "S" | "M" | "L" | "LL" | "AI";
+export const stackSizes = ["S", "M", "L", "LL", "LLL", "LLLL"] as const;
+export type StackSize = (typeof stackSizes)[number];
