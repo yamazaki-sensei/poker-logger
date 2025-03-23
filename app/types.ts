@@ -62,3 +62,5 @@ export type ActionWithPlayer = {
   player: Position;
   action: Action;
 };
+
+export type StackSize = "S" | "M" | "L" | "LL" | "AI";

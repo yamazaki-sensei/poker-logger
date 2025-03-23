@@ -1,15 +1,14 @@
 "use client";
-import { c } from "node_modules/vite/dist/node/types.d-aGj9QkWt";
-import { useTable, type TableState } from "./table";
+import type { TableState } from "./table";
 import type {
   Action,
   ActionWithPlayer,
   Card,
   GameRound,
   Position,
+  StackSize,
 } from "./types";
 import { atom, useAtom } from "jotai";
-import { act } from "react";
 
 type PlayerState = {
   hands: [Card, Card] | undefined;
@@ -39,6 +38,7 @@ export interface GameState {
   };
   readonly memo: string;
   readonly previousState?: GameState;
+  readonly effectiveStack?: StackSize;
 }
 
 const defaultGameState: GameState = {

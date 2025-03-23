@@ -9,13 +9,21 @@ import {
   SelectContent,
 } from "./components/ui/select";
 import { useGameState, useGameStateReset } from "./game";
-import { Separator } from "./components/ui/separator";
 import { useResultsWriter } from "./results";
 import { Link } from "react-router";
 import { useToast } from "./hooks/use-toast";
 import { Dialog, DialogTitle, DialogContent } from "./components/ui/dialog";
 
-const Footer = () => {
+export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
+  const { resetGame } = useGameStateReset();
+  const { gameState, setMemo, setMyPosition } = useGameState();
+  const { storeCurrentBoard } = useResultsWriter();
+  const { toast } = useToast();
+  const [positionDialogShown, setPositionDialogShown] = useState(false);
+  const reset = () => {
+    resetGame(table);
+    setPositionDialogShown(true);
+  };
   const { table, updateTable } = useTable();
 
   const onPlayersCountChange = (v: string) => {
@@ -23,104 +31,6 @@ const Footer = () => {
       ...table,
       playersCount: Number.parseInt(v),
     });
-  };
-
-  const onSbChange = (event: ChangeEvent<HTMLInputElement>) => {
-    updateTable({
-      ...table,
-      sb: Number.parseInt(event.currentTarget.value || "0"),
-    });
-  };
-
-  const onBbChange = (event: ChangeEvent<HTMLInputElement>) => {
-    updateTable({
-      ...table,
-      bb: Number.parseInt(event.currentTarget.value || "0"),
-    });
-  };
-
-  const onAnteChange = (event: ChangeEvent<HTMLInputElement>) => {
-    updateTable({
-      ...table,
-      ante: Number.parseInt(event.currentTarget.value || "0"),
-    });
-  };
-
-  return (
-    <div>
-      <div className="flex">
-        <div className="flex items-center">
-          <div className="text-sm">人数:</div>
-          <div className="ml-2">
-            <Select
-              value={`${table.playersCount}`}
-              onValueChange={onPlayersCountChange}
-            >
-              <SelectTrigger>
-                <div className="flex items-center">
-                  <span className="ml-1">{table.playersCount}人</span>
-                </div>
-              </SelectTrigger>
-              <SelectContent position="popper">
-                {[2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                  <SelectItem key={n} value={`${n}`} className="cursor-pointer">
-                    {n}人
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
-      <div className="grid grid-cols-3 mt-2">
-        <div className="flex items-center pr-2">
-          SB:
-          <div className="ml-2">
-            <Input
-              min={0}
-              type="number"
-              value={`${table.sb}`.replace(/^0+/, "") || "0"}
-              onChange={onSbChange}
-            />
-          </div>
-        </div>
-        <div className="flex items-center pr-2">
-          BB:
-          <div className="ml-2">
-            <Input
-              min={0}
-              value={`${table.bb}`.replace(/^0+/, "") || "0"}
-              type="number"
-              onChange={onBbChange}
-            />
-          </div>
-        </div>
-        <div className="flex items-center">
-          Ante:
-          <div className="ml-2">
-            <Input
-              min={0}
-              value={`${table.ante}`.replace(/^0+/, "") || "0"}
-              type="number"
-              onChange={onAnteChange}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
-  const { resetGame } = useGameStateReset();
-  const { gameState, setMemo, setMyPosition } = useGameState();
-  const { storeCurrentBoard } = useResultsWriter();
-  const { table } = useTable();
-  const { toast } = useToast();
-  const [positionDialogShown, setPositionDialogShown] = useState(false);
-  const reset = () => {
-    resetGame(table);
-    setPositionDialogShown(true);
   };
 
   return (
@@ -139,25 +49,42 @@ export const TableSettingsFrame = ({ children }: { children: ReactNode }) => {
       </div>
       <div className="fixed bottom-0 w-full bg-secondary">
         <div className="flex p-2">
-          <Button
-            onClick={() => {
-              storeCurrentBoard();
-              toast({
-                description: "ボードを保存しました",
-              });
-            }}
-          >
-            現在のボードを保存
-          </Button>
-          <div className="flex items-center ml-4">
-            <Link to="/results" className="text-sm underline">
-              保存したボードを確認
-            </Link>
+          <div>
+            <Select
+              value={`${table.playersCount}`}
+              onValueChange={onPlayersCountChange}
+            >
+              <SelectTrigger>
+                <div className="flex items-center">
+                  <span className="ml-1">{table.playersCount}人</span>
+                </div>
+              </SelectTrigger>
+              <SelectContent position="popper">
+                {[2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                  <SelectItem key={n} value={`${n}`} className="cursor-pointer">
+                    {n}人
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-        </div>
-        <Separator />
-        <div className="p-2">
-          <Footer />
+          <div className="flex items-center ml-4 justify-end w-full">
+            <Button
+              onClick={() => {
+                storeCurrentBoard();
+                toast({
+                  description: "ボードを保存しました",
+                });
+              }}
+            >
+              現在のボードを保存
+            </Button>
+            <div className="flex items-center ml-4">
+              <Link to="/results" className="text-sm underline">
+                保存したボードを確認
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
       <div>
