@@ -13,6 +13,6 @@ export const stackSizeToText = (stackSize: StackSize): string => {
     case "LLL":
       return "50BB - 100BB";
     case "LLLL":
-      return "50BB以上";
+      return "100BB以上";
   }
 };
